@@ -1,0 +1,116 @@
+/*
+Supersized - Fullscreen Slideshow jQuery Plugin Stylesheet Version 3.0
+By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
+Version: supersized.3.0.js
+Website: www.buildinternet.com/project/supersized
+*/
+
+	*{
+	    margin:0;
+	    padding:0;
+	}
+	a{
+	    color:#8FC2FF;
+	    text-decoration: none;
+	    outline: none;
+	}
+	img{
+	    border:none;
+	}
+	body {
+	    overflow:hidden;/*Needed to eliminate scrollbars*/
+	    background:#000;
+	}
+	/*Area to place content normally*/
+	#content-wrapper{ 
+		width:100%; 
+		height:100%; 
+		position:absolute; 
+		top:0; 
+		overflow:auto; 
+		z-index:4; 
+		text-align:center; 
+	}
+	
+	/*Controls Section*/
+	#controls-wrapper{
+	    margin:0px auto;
+	    height:62px;
+	    width:100%;
+	    bottom:0;
+	    z-index: 5;
+	    background:url('images/nav-bg.png') repeat-x;
+	    position:absolute;
+	}
+	#controls{
+	    overflow: hidden;
+	    height: 100%;
+	    text-align:left;
+	    z-index: 5;
+	    padding:0 114px; /* Increase padding to give thumbnails room */
+	}
+	#slidecounter{
+	    float:left;
+	    color:#888;
+	    font:23px "Helvetica Neue", "Helvetica", Arial, sans-serif;
+	    font-weight:bold;
+	    text-shadow: #000 0px -1px 0px;
+	    margin:19px 10px 18px 20px;	
+	}
+	#slidecaption{
+	    overflow: hidden;
+	    float:left;
+	    color:#FFF;
+	    font:16px "Helvetica Neue", "Helvetica", Arial, sans-serif;
+	    font-weight:bold;
+	    text-shadow: #000 0px 2px 0px;
+	    margin:23px 20px 23px 0;
+	}
+	
+	
+	/*Supersized Link*/
+	.stamp{ float: right; margin: 15px 30px 0 0;}
+	
+	
+	/*Supersize Plugin Styles*/
+	#navigation{
+	    float: right;
+	    margin:10px 20px 0 0;
+	}
+	#loading {
+	    position: absolute;
+	    top: 49.5%; 
+	    left: 49.5%;
+	    z-index: 10;
+	    width: 24px; 
+	    height: 24px;
+	    text-indent: -999em;
+	    background-image: url(images/progress.gif);
+	}
+	#supersized{
+	    position:fixed;
+	}
+	#supersized img{ -ms-interpolation-mode: bicubic; }
+	#supersized img, #supersized a{
+	    height:100%;
+	    width:100%;
+	    position:absolute;
+	    z-index: -1;
+	}
+	
+	#supersized .prevslide, #supersized .prevslide img{
+	    z-index: 1;
+	}
+	#supersized .activeslide, #supersized .activeslide img{
+	    z-index: 2;
+	}
+	
+	#nextthumb, #prevthumb{ z-index:6; display:none; position:absolute; bottom:12px; height:75px; width:100px; overflow:hidden; border:2px solid #fff; -webkit-box-shadow: 0px 0px 5px #000; }
+	#nextthumb{ right:12px; }
+	#prevthumb{ left:12px; }
+		#nextthumb img, #prevthumb img{ width:150px; }
+		#nextthumb:active, #prevthumb:active{ bottom:10px; }
+		
+		/*Add hover pointer*/
+		#controls > *:hover, #nextthumb:hover, #prevthumb:hover{ cursor:pointer; }
+		
