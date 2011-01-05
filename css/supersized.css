@@ -39,7 +39,7 @@ Website: www.buildinternet.com/project/supersized
 	    width:100%;
 	    bottom:0;
 	    z-index: 5;
-	    background:url('images/nav-bg.png') repeat-x;
+	    background:url('../images/nav-bg.png') repeat-x;
 	    position:absolute;
 	}
 	#controls{

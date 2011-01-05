@@ -1,5 +1,5 @@
 <!--
-slidehover.html
+plainslides.html
 Supersized - Fullscreen Slideshow jQuery Plugin Version 3.0
 By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
 Website: www.buildinternet.com/project/supersized
@@ -12,13 +12,13 @@ Website: www.buildinternet.com/project/supersized
 	<title>Supersized - Full Screen Background/Slideshow jQuery Plugin</title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	
-	<link rel="stylesheet" href="supersized.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="../css/supersized.css" type="text/css" media="screen" />
 	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
-	<script src="js/effects.core.js"></script>
-	<script src="js/effects.slide.js"></script>
+	<script src="../js/effects.core.js"></script>
+	<script src="../js/effects.slide.js"></script>
 	
-	<script type="text/javascript" src="supersized.3.0.js"></script>
+	<script type="text/javascript" src="../supersized.3.0.js"></script>
 	<script type="text/javascript">  
 		$(function(){
 			$.fn.supersized.options = {  
@@ -26,12 +26,12 @@ Website: www.buildinternet.com/project/supersized
 				startheight: 480,
 				vertical_center: 1,
 				slideshow: 1,
-				navigation: 1,
+				navigation: 0,
 				thumbnail_navigation: 0,
-				transition: 3, //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
-				pause_hover: 1,
-				slide_counter: 1,
-				slide_captions: 1,
+				transition: 1, //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
+				pause_hover: 0,
+				slide_counter: 0,
+				slide_captions: 0,
 				slide_interval: 3000,
 				slides : [
 					{image : 'slides/tower.jpg', title : 'City Clock Tower', url : 'http://www.flickr.com/photos/wumbus/4582735030/in/set-72157623876357531/'},
@@ -43,44 +43,38 @@ Website: www.buildinternet.com/project/supersized
 	    });
 	</script>
 	
+
 	<style type="text/css">
-		#controls{ padding:0 10px; }
-	</style>
-</head>
-
-<body>
-
-<!--Loading display while images load-->
-<div id="loading">&nbsp;</div>
-
-<!--Slides-->
-<div id="supersized"></div>
-
-<!--Control Bar-->
-<div id="controls-wrapper">
-	<div id="controls">
 	
-		<!--Slide counter-->
-		<div id="slidecounter">
-			<span class="slidenumber"></span>/<span class="totalslides"></span>
-		</div>
+		#content{ background-color:rgba(0,0,0,0.65); width:720px; height:800px; margin:30px auto; text-align:left; }
+			
+		/*Demo Styles*/
+		h3{ padding:30px 30px 20px 30px; }
+		p{ padding:0 30px 30px 30px; color:#fff; font:13pt "Helvetica Neue", "Helvetica", Arial, sans-serif; text-shadow: #000 0px 2px 0px; line-height:160%; }
+		.plugin-logo{ float:right; }
 		
-		<!--Slide captions displayed here-->
-		<div id="slidecaption"></div>
-		
-		<div id="prevthumb"></div>
-		<div id="nextthumb"></div>
-		
-		<!--Navigation-->
-		<div id="navigation">
-			<img id="prevslide" src="images/back_dull.png"/><img id="pauseplay" src="images/pause_dull.png"/><img id="nextslide" src="images/forward_dull.png"/>
-		</div>
-		
-		<a href="http://www.buildinternet.com" class="stamp"><img src="images/supersized-logo.png"/></a>
-		
-	</div>
-</div>
+	</style>
+	</head>
 
+	<body>
+	
+	<!--Loading display while images load-->
+	<div id="loading">&nbsp;</div>
+	
+	<!--Content Area-->
+	<div id="content-wrapper">
+		<div id="content">
+			<h3><a href="http://www.buildinternet.com" ><img src="../images/buildinternet-logo.png"/></a> <a href="http://www.buildinternet.com" class="plugin-logo"><img src="../images/supersized-logo.png"/></a></h3>
+			<p>
+				If you want to run a <strong>fullscreen slideshow behind your content</strong>, this demo is for you.
+			</p>
+		</div>
+	</div>
+	
+	
+	<!--Slides-->
+	<div id="supersized"></div>
+	
 
 </body>
 </html>
