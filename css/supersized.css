@@ -1,7 +1,7 @@
 /*
 Supersized - Fullscreen Slideshow jQuery Plugin Stylesheet Version 3.0
 By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
-Version: supersized.3.0.js
+Version: supersized.3.1.js
 Website: www.buildinternet.com/project/supersized
 */
 
@@ -39,7 +39,7 @@ Website: www.buildinternet.com/project/supersized
 	    width:100%;
 	    bottom:0;
 	    z-index: 5;
-	    background:url('../images/nav-bg.png') repeat-x;
+	    background:url('../img/nav-bg.png') repeat-x;
 	    position:absolute;
 	}
 	#controls{
@@ -85,15 +85,15 @@ Website: www.buildinternet.com/project/supersized
 	    width: 24px; 
 	    height: 24px;
 	    text-indent: -999em;
-	    background-image: url(images/progress.gif);
+	    background-image: url(../img/progress.gif);
 	}
 	#supersized{
 	    position:fixed;
 	}
 	#supersized img{ -ms-interpolation-mode: bicubic; }
 	#supersized img, #supersized a{
-	    height:100%;
-	    width:100%;
+	    min-height:100%;
+	    min-width:100%;
 	    position:absolute;
 	    z-index: -1;
 	}
@@ -105,7 +105,7 @@ Website: www.buildinternet.com/project/supersized
 	    z-index: 2;
 	}
 	
-	#nextthumb, #prevthumb{ z-index:6; display:none; position:absolute; bottom:12px; height:75px; width:100px; overflow:hidden; border:2px solid #fff; -webkit-box-shadow: 0px 0px 5px #000; }
+	#nextthumb, #prevthumb{ z-index:6; display:none; position:absolute; bottom:12px; height:75px; width:100px; overflow:hidden; background:#ddd; border:2px solid #fff; -webkit-box-shadow: 0px 0px 5px #000; }
 	#nextthumb{ right:12px; }
 	#prevthumb{ left:12px; }
 		#nextthumb img, #prevthumb img{ width:150px; }

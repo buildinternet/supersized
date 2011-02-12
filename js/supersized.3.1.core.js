@@ -1,55 +1,63 @@
 /*
 Supersized - Fullscreen Slideshow jQuery Plugin
-Version 3.0 - Core
+Version 3.1 - Core
 By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
-Version: supersized.3.0.js
+Version: supersized.3.1.js
 Website: www.buildinternet.com/project/supersized
 */
 
 (function($){
-
+	
+	
 	//Resize image on ready or resize
-	$.fn.supersized = function() {
+	$.fn.supersized = function( options ) {
 		
-		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
+		var element = this;
+		
+		if ( options ) {
+			//Pull from both defaults and supplied options
+			var options = $.extend( {}, $.fn.supersized.defaults, options);
+		}else{
+			//Only pull from default settings
+			var options = $.extend( {}, $.fn.supersized.defaults)
+		}
+		
 		$.currentSlide = 0;
 		
 		//Set current image
-		$("<img/>").attr("src", options.slides[$.currentSlide].image).appendTo("#supersized");
+		$("<img/>").attr("src", options.slides[$.currentSlide].image).appendTo(element);
 		
 		$(window).bind("load", function(){
 			
 			$('#loading').hide();
-			$('#supersized').fadeIn('fast');
-						
-			$('#supersized').resizenow();
+			element.fadeIn('fast');
+
+			resizenow(element, options);
 			
 		});
 				
 		$(document).ready(function() {
-			$('#supersized').resizenow(); 
+			resizenow(element, options);
 		});
 		
 		
 		$(window).bind("resize", function(){
-    		$('#supersized').resizenow(); 
+    		resizenow(element, options); 
 		});
 		
-		$('#supersized').hide();
+		element.hide();
 	};
 	
 	//Adjust image size
-	$.fn.resizenow = function() {
-		var t = $(this);
-		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
+	function resizenow(element, options) {
+		
+		var t = element;
 	  	return t.each(function() {
 	  		
 			//Define image ratio
-			var ratio = options.startheight/options.startwidth;
+			var ratio = t.find('img').height()/t.find('img').width();
 			
 			//Gather browser and current image size
-			var imagewidth = t.width();
-			var imageheight = t.height();
 			var browserwidth = $(window).width();
 			var browserheight = $(window).height();
 			var offset;
@@ -66,6 +74,8 @@ Website: www.buildinternet.com/project/supersized
 			    t.children().width(browserwidth);
 			    t.children().height(browserwidth * ratio);
 			}
+			
+			//Vertically Center
 			if (options.vertical_center == 1){
 				t.children().css('left', (browserwidth - t.width())/2);
 				t.children().css('top', (browserheight - t.height())/2);
@@ -73,12 +83,12 @@ Website: www.buildinternet.com/project/supersized
 			return false;
 		});
 	};
-		
+	
+	//Default Options	
 	$.fn.supersized.defaults = { 
-			startwidth: 4,  
-			startheight: 3,
-			vertical_center: 1
+	
+			vertical_center		:	  1
+			
 	};
 	
 })(jQuery);
-

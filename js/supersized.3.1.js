@@ -1,9 +1,11 @@
 /*
+
 Supersized - Fullscreen Slideshow jQuery Plugin
-Version 3.0
+Version 3.1
 By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
-Version: supersized.3.0.js
+Version: supersized.3.1.js
 Website: www.buildinternet.com/project/supersized
+
 */
 
 (function($){
@@ -18,7 +20,7 @@ Website: www.buildinternet.com/project/supersized
 		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
 		$.currentSlide = options.start_slide - 1;
 		
-		/******Set up initial images -- Add class doesnt work*****/
+		/******Set up initial Images -- Add class doesnt work*****/
 		//Set previous image
 		var imageLink = (options.slides[options.slides.length - 1].url) ? "href='" + options.slides[options.slides.length - 1].url + "'" : "";
 		$("<img/>").attr("src", options.slides[options.slides.length - 1].image).appendTo("#supersized").wrap("<a " + imageLink + "></a>");//Doesnt account for start slide
@@ -105,35 +107,35 @@ Website: www.buildinternet.com/project/supersized
 				        return false;
 				    });
 				    $('#nextslide').mousedown(function() {
-					   	$(this).attr("src", "images/forward.png");
+					   	$(this).attr("src", "img/forward.png");
 					});
 					$('#nextslide').mouseup(function() {
-					    $(this).attr("src", "images/forward_dull.png");
+					    $(this).attr("src", "img/forward_dull.png");
 					});
 					$('#nextslide').mouseout(function() {
-					    $(this).attr("src", "images/forward_dull.png");
+					    $(this).attr("src", "img/forward_dull.png");
 					});
 					
 					$('#prevslide').mousedown(function() {
-					    $(this).attr("src", "images/back.png");
+					    $(this).attr("src", "img/back.png");
 					});
 					$('#prevslide').mouseup(function() {
-					    $(this).attr("src", "images/back_dull.png");
+					    $(this).attr("src", "img/back_dull.png");
 					});
 					$('#prevslide').mouseout(function() {
-					    $(this).attr("src", "images/back_dull.png");
+					    $(this).attr("src", "img/back_dull.png");
 					});
 					
 				    //Play/Pause Button
 				    $('#pauseplay').click(function() {
 				    	if($.inAnimation) return false;
-				    	var src = ($(this).attr("src") === "images/play.png") ? "images/pause.png" : "images/play.png";
-      					if (src == "images/pause.png"){
-      						$(this).attr("src", "images/play.png");
+				    	var src = ($(this).attr("src") === "img/play.png") ? "img/pause.png" : "img/play.png";
+      					if (src == "img/pause.png"){
+      						$(this).attr("src", "img/play.png");
       						$.paused = false;
 					        slideshow_interval = setInterval(nextslide, options.slide_interval);  
 				        }else{
-				        	$(this).attr("src", "images/pause.png");
+				        	$(this).attr("src", "img/pause.png");
 				        	clearInterval(slideshow_interval);
 				        	$.paused = true;
 				        }
@@ -141,20 +143,20 @@ Website: www.buildinternet.com/project/supersized
 					    return false;
 				    });
 				    $('#pauseplay').mouseover(function() {
-				    	var imagecheck = ($(this).attr("src") === "images/play_dull.png");
+				    	var imagecheck = ($(this).attr("src") === "img/play_dull.png");
 				    	if (imagecheck){
-      						$(this).attr("src", "images/play.png"); 
+      						$(this).attr("src", "img/play.png"); 
 				        }else{
-				        	$(this).attr("src", "images/pause.png");
+				        	$(this).attr("src", "img/pause.png");
 				        }
 				    });
 				    
 				    $('#pauseplay').mouseout(function() {
-				    	var imagecheck = ($(this).attr("src") === "images/play.png");
+				    	var imagecheck = ($(this).attr("src") === "img/play.png");
 				    	if (imagecheck){
-      						$(this).attr("src", "images/play_dull.png"); 
+      						$(this).attr("src", "img/play_dull.png"); 
 				        }else{
-				        	$(this).attr("src", "images/pause_dull.png");
+				        	$(this).attr("src", "img/pause_dull.png");
 				        }
 				        return false;
 				    });
@@ -170,7 +172,7 @@ Website: www.buildinternet.com/project/supersized
 		$('#supersized').hover(function() {
 	   		if (options.slideshow == 1 && options.pause_hover == 1){
 	   			if(!($.paused) && options.navigation == 1){
-	   				$('#pauseplay').attr("src", "images/pause.png"); 
+	   				$('#pauseplay').attr("src", "img/pause.png"); 
 	   				clearInterval(slideshow_interval);
 	   			}
 	   		}
@@ -178,7 +180,7 @@ Website: www.buildinternet.com/project/supersized
 	   	}, function() {
 			if (options.slideshow == 1 && options.pause_hover == 1){
 				if(!($.paused) && options.navigation == 1){
-					$('#pauseplay').attr("src", "images/pause_dull.png");
+					$('#pauseplay').attr("src", "img/pause_dull.png");
 					slideshow_interval = setInterval(nextslide, options.slide_interval);
 				} 
 			}
@@ -200,7 +202,9 @@ Website: www.buildinternet.com/project/supersized
 	  	return t.each(function() {
 	  		
 			//Define image ratio
-			var ratio = options.startheight/options.startwidth;
+			var naturalHeight = t.find('.activeslide img').height();
+			var naturalWidth = t.find('.activeslide img').width();
+			var ratio = naturalHeight/naturalWidth;
 			
 			//Gather browser and current image size
 			var imagewidth = t.width();
@@ -376,19 +380,19 @@ Website: www.buildinternet.com/project/supersized
 	    	$('#supersized').resizenow();//Fix for resize mid-transition
 	}
 	
-	$.fn.supersized.defaults = { 
-			startwidth: 4,  
-			startheight: 3,
-			vertical_center: 1,
-			slideshow: 1,
-			navigation:1,
-			thumbnail_navigation: 0,
-			transition: 1, //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
-			pause_hover: 0,
-			slide_counter: 1,
-			slide_captions: 1,
-			slide_interval: 5000,
-			start_slide: 1
+	//Default Settings
+	
+	$.fn.supersized.defaults = {
+			vertical_center         :   1,
+			slideshow               :   1,
+			navigation              :   1,
+			thumbnail_navigation    :   0,
+			transition              :   1,   //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
+			pause_hover             :   0,
+			slide_counter           :   1,
+			slide_captions          :   1,
+			slide_interval          :   5000,
+			start_slide             :   1
 	};
 	
 })(jQuery);
