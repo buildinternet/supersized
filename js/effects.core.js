@@ -1,200 +1,38 @@
 /*
- * jQuery UI Effects 1.5.3
+ * jQuery UI Effects 1.8.9
  *
- * Copyright (c) 2008 Aaron Eisenberger (aaronchi@gmail.com)
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
- * 
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
  * http://docs.jquery.com/UI/Effects/
  */
-;(function($) {
+;jQuery.effects || (function($, undefined) {
 
-$.effects = $.effects || {}; //Add the 'effects' scope
+$.effects = {};
 
-$.extend($.effects, {
-	save: function(el, set) {
-		for(var i=0;i<set.length;i++) {
-			if(set[i] !== null) $.data(el[0], "ec.storage."+set[i], el[0].style[set[i]]);
+
+
+/******************************************************************************/
+/****************************** COLOR ANIMATIONS ******************************/
+/******************************************************************************/
+
+// override the animation for color styles
+$.each(['backgroundColor', 'borderBottomColor', 'borderLeftColor',
+	'borderRightColor', 'borderTopColor', 'borderColor', 'color', 'outlineColor'],
+function(i, attr) {
+	$.fx.step[attr] = function(fx) {
+		if (!fx.colorInit) {
+			fx.start = getColor(fx.elem, attr);
+			fx.end = getRGB(fx.end);
+			fx.colorInit = true;
 		}
-	},
-	restore: function(el, set) {
-		for(var i=0;i<set.length;i++) {
-			if(set[i] !== null) el.css(set[i], $.data(el[0], "ec.storage."+set[i]));
-		}
-	},
-	setMode: function(el, mode) {
-		if (mode == 'toggle') mode = el.is(':hidden') ? 'show' : 'hide'; // Set for toggle
-		return mode;
-	},
-	getBaseline: function(origin, original) { // Translates a [top,left] array into a baseline value
-		// this should be a little more flexible in the future to handle a string & hash
-		var y, x;
-		switch (origin[0]) {
-			case 'top': y = 0; break;
-			case 'middle': y = 0.5; break;
-			case 'bottom': y = 1; break;
-			default: y = origin[0] / original.height;
-		};
-		switch (origin[1]) {
-			case 'left': x = 0; break;
-			case 'center': x = 0.5; break;
-			case 'right': x = 1; break;
-			default: x = origin[1] / original.width;
-		};
-		return {x: x, y: y};
-	},
-	createWrapper: function(el) {
-		if (el.parent().attr('id') == 'fxWrapper')
-			return el;
-		var props = {width: el.outerWidth({margin:true}), height: el.outerHeight({margin:true}), 'float': el.css('float')};
-		el.wrap('<div id="fxWrapper" style="font-size:100%;background:transparent;border:none;margin:0;padding:0"></div>');
-		var wrapper = el.parent();
-		if (el.css('position') == 'static'){
-			wrapper.css({position: 'relative'});
-			el.css({position: 'relative'});
-		} else {
-			var top = el.css('top'); if(isNaN(parseInt(top))) top = 'auto';
-			var left = el.css('left'); if(isNaN(parseInt(left))) left = 'auto';
-			wrapper.css({ position: el.css('position'), top: top, left: left, zIndex: el.css('z-index') }).show();
-			el.css({position: 'relative', top:0, left:0});
-		}
-		wrapper.css(props);
-		return wrapper;
-	},
-	removeWrapper: function(el) {
-		if (el.parent().attr('id') == 'fxWrapper')
-			return el.parent().replaceWith(el);
-		return el;
-	},
-	setTransition: function(el, list, factor, val) {
-		val = val || {};
-		$.each(list,function(i, x){
-			unit = el.cssUnit(x);
-			if (unit[0] > 0) val[x] = unit[0] * factor + unit[1];
-		});
-		return val;
-	},
-	animateClass: function(value, duration, easing, callback) {
 
-		var cb = (typeof easing == "function" ? easing : (callback ? callback : null));
-		var ea = (typeof easing == "object" ? easing : null);
-
-		return this.each(function() {
-
-			var offset = {}; var that = $(this); var oldStyleAttr = that.attr("style") || '';
-			if(typeof oldStyleAttr == 'object') oldStyleAttr = oldStyleAttr["cssText"]; /* Stupidly in IE, style is a object.. */
-			if(value.toggle) { that.hasClass(value.toggle) ? value.remove = value.toggle : value.add = value.toggle; }
-
-			//Let's get a style offset
-			var oldStyle = $.extend({}, (document.defaultView ? document.defaultView.getComputedStyle(this,null) : this.currentStyle));
-			if(value.add) that.addClass(value.add); if(value.remove) that.removeClass(value.remove);
-			var newStyle = $.extend({}, (document.defaultView ? document.defaultView.getComputedStyle(this,null) : this.currentStyle));
-			if(value.add) that.removeClass(value.add); if(value.remove) that.addClass(value.remove);
-
-			// The main function to form the object for animation
-			for(var n in newStyle) {
-				if( typeof newStyle[n] != "function" && newStyle[n] /* No functions and null properties */
-				&& n.indexOf("Moz") == -1 && n.indexOf("length") == -1 /* No mozilla spezific render properties. */
-				&& newStyle[n] != oldStyle[n] /* Only values that have changed are used for the animation */
-				&& (n.match(/color/i) || (!n.match(/color/i) && !isNaN(parseInt(newStyle[n],10)))) /* Only things that can be parsed to integers or colors */
-				&& (oldStyle.position != "static" || (oldStyle.position == "static" && !n.match(/left|top|bottom|right/))) /* No need for positions when dealing with static positions */
-				) offset[n] = newStyle[n];
-			}
-
-			that.animate(offset, duration, ea, function() { // Animate the newly constructed offset object
-				// Change style attribute back to original. For stupid IE, we need to clear the damn object.
-				if(typeof $(this).attr("style") == 'object') { $(this).attr("style")["cssText"] = ""; $(this).attr("style")["cssText"] = oldStyleAttr; } else $(this).attr("style", oldStyleAttr);
-				if(value.add) $(this).addClass(value.add); if(value.remove) $(this).removeClass(value.remove);
-				if(cb) cb.apply(this, arguments);
-			});
-
-		});
-	}
-});
-
-//Extend the methods of jQuery
-$.fn.extend({
-	//Save old methods
-	_show: $.fn.show,
-	_hide: $.fn.hide,
-	__toggle: $.fn.toggle,
-	_addClass: $.fn.addClass,
-	_removeClass: $.fn.removeClass,
-	_toggleClass: $.fn.toggleClass,
-	// New ec methods
-	effect: function(fx,o,speed,callback) {
-		return $.effects[fx] ? $.effects[fx].call(this, {method: fx, options: o || {}, duration: speed, callback: callback }) : null;
-	},
-	show: function() {
-		if(!arguments[0] || (arguments[0].constructor == Number || /(slow|normal|fast)/.test(arguments[0])))
-			return this._show.apply(this, arguments);
-		else {
-			var o = arguments[1] || {}; o['mode'] = 'show';
-			return this.effect.apply(this, [arguments[0], o, arguments[2] || o.duration, arguments[3] || o.callback]);
-		}
-	},
-	hide: function() {
-		if(!arguments[0] || (arguments[0].constructor == Number || /(slow|normal|fast)/.test(arguments[0])))
-			return this._hide.apply(this, arguments);
-		else {
-			var o = arguments[1] || {}; o['mode'] = 'hide';
-			return this.effect.apply(this, [arguments[0], o, arguments[2] || o.duration, arguments[3] || o.callback]);
-		}
-	},
-	toggle: function(){
-		if(!arguments[0] || (arguments[0].constructor == Number || /(slow|normal|fast)/.test(arguments[0])) || (arguments[0].constructor == Function))
-			return this.__toggle.apply(this, arguments);
-		else {
-			var o = arguments[1] || {}; o['mode'] = 'toggle';
-			return this.effect.apply(this, [arguments[0], o, arguments[2] || o.duration, arguments[3] || o.callback]);
-		}
-	},
-	addClass: function(classNames,speed,easing,callback) {
-		return speed ? $.effects.animateClass.apply(this, [{ add: classNames },speed,easing,callback]) : this._addClass(classNames);
-	},
-	removeClass: function(classNames,speed,easing,callback) {
-		return speed ? $.effects.animateClass.apply(this, [{ remove: classNames },speed,easing,callback]) : this._removeClass(classNames);
-	},
-	toggleClass: function(classNames,speed,easing,callback) {
-		return speed ? $.effects.animateClass.apply(this, [{ toggle: classNames },speed,easing,callback]) : this._toggleClass(classNames);
-	},
-	morph: function(remove,add,speed,easing,callback) {
-		return $.effects.animateClass.apply(this, [{ add: add, remove: remove },speed,easing,callback]);
-	},
-	switchClass: function() {
-		return this.morph.apply(this, arguments);
-	},
-	// helper functions
-	cssUnit: function(key) {
-		var style = this.css(key), val = [];
-		$.each( ['em','px','%','pt'], function(i, unit){
-			if(style.indexOf(unit) > 0)
-				val = [parseFloat(style), unit];
-		});
-		return val;
-	}
-});
-
-/*
- * jQuery Color Animations
- * Copyright 2007 John Resig
- * Released under the MIT and GPL licenses.
- */
-
-// We override the animation for all of these color styles
-jQuery.each(['backgroundColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'borderTopColor', 'color', 'outlineColor'], function(i,attr){
-		jQuery.fx.step[attr] = function(fx){
-				if ( fx.state == 0 ) {
-						fx.start = getColor( fx.elem, attr );
-						fx.end = getRGB( fx.end );
-				}
-
-				fx.elem.style[attr] = "rgb(" + [
-						Math.max(Math.min( parseInt((fx.pos * (fx.end[0] - fx.start[0])) + fx.start[0]), 255), 0),
-						Math.max(Math.min( parseInt((fx.pos * (fx.end[1] - fx.start[1])) + fx.start[1]), 255), 0),
-						Math.max(Math.min( parseInt((fx.pos * (fx.end[2] - fx.start[2])) + fx.start[2]), 255), 0)
-				].join(",") + ")";
-		}
+		fx.elem.style[attr] = 'rgb(' +
+			Math.max(Math.min(parseInt((fx.pos * (fx.end[0] - fx.start[0])) + fx.start[0], 10), 255), 0) + ',' +
+			Math.max(Math.min(parseInt((fx.pos * (fx.end[1] - fx.start[1])) + fx.start[1], 10), 255), 0) + ',' +
+			Math.max(Math.min(parseInt((fx.pos * (fx.end[2] - fx.start[2])) + fx.start[2], 10), 255), 0) + ')';
+	};
 });
 
 // Color Conversion functions from highlightFade
@@ -211,7 +49,7 @@ function getRGB(color) {
 
 		// Look for rgb(num,num,num)
 		if (result = /rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(color))
-				return [parseInt(result[1]), parseInt(result[2]), parseInt(result[3])];
+				return [parseInt(result[1],10), parseInt(result[2],10), parseInt(result[3],10)];
 
 		// Look for rgb(num%,num%,num%)
 		if (result = /rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(color))
@@ -227,20 +65,20 @@ function getRGB(color) {
 
 		// Look for rgba(0, 0, 0, 0) == transparent in Safari 3
 		if (result = /rgba\(0, 0, 0, 0\)/.exec(color))
-				return colors['transparent']
+				return colors['transparent'];
 
 		// Otherwise, we're most likely dealing with a named color
-		return colors[jQuery.trim(color).toLowerCase()];
+		return colors[$.trim(color).toLowerCase()];
 }
 
 function getColor(elem, attr) {
 		var color;
 
 		do {
-				color = jQuery.curCSS(elem, attr);
+				color = $.curCSS(elem, attr);
 
 				// Keep going until we find an element that has color, or we hit the body
-				if ( color != '' && color != 'transparent' || jQuery.nodeName(elem, "body") )
+				if ( color != '' && color != 'transparent' || $.nodeName(elem, "body") )
 						break;
 
 				attr = "backgroundColor";
@@ -299,7 +137,407 @@ var colors = {
 	yellow:[255,255,0],
 	transparent: [255,255,255]
 };
+
+
+
+/******************************************************************************/
+/****************************** CLASS ANIMATIONS ******************************/
+/******************************************************************************/
+
+var classAnimationActions = ['add', 'remove', 'toggle'],
+	shorthandStyles = {
+		border: 1,
+		borderBottom: 1,
+		borderColor: 1,
+		borderLeft: 1,
+		borderRight: 1,
+		borderTop: 1,
+		borderWidth: 1,
+		margin: 1,
+		padding: 1
+	};
+
+function getElementStyles() {
+	var style = document.defaultView
+			? document.defaultView.getComputedStyle(this, null)
+			: this.currentStyle,
+		newStyle = {},
+		key,
+		camelCase;
+
+	// webkit enumerates style porperties
+	if (style && style.length && style[0] && style[style[0]]) {
+		var len = style.length;
+		while (len--) {
+			key = style[len];
+			if (typeof style[key] == 'string') {
+				camelCase = key.replace(/\-(\w)/g, function(all, letter){
+					return letter.toUpperCase();
+				});
+				newStyle[camelCase] = style[key];
+			}
+		}
+	} else {
+		for (key in style) {
+			if (typeof style[key] === 'string') {
+				newStyle[key] = style[key];
+			}
+		}
+	}
 	
+	return newStyle;
+}
+
+function filterStyles(styles) {
+	var name, value;
+	for (name in styles) {
+		value = styles[name];
+		if (
+			// ignore null and undefined values
+			value == null ||
+			// ignore functions (when does this occur?)
+			$.isFunction(value) ||
+			// shorthand styles that need to be expanded
+			name in shorthandStyles ||
+			// ignore scrollbars (break in IE)
+			(/scrollbar/).test(name) ||
+
+			// only colors or values that can be converted to numbers
+			(!(/color/i).test(name) && isNaN(parseFloat(value)))
+		) {
+			delete styles[name];
+		}
+	}
+	
+	return styles;
+}
+
+function styleDifference(oldStyle, newStyle) {
+	var diff = { _: 0 }, // http://dev.jquery.com/ticket/5459
+		name;
+
+	for (name in newStyle) {
+		if (oldStyle[name] != newStyle[name]) {
+			diff[name] = newStyle[name];
+		}
+	}
+
+	return diff;
+}
+
+$.effects.animateClass = function(value, duration, easing, callback) {
+	if ($.isFunction(easing)) {
+		callback = easing;
+		easing = null;
+	}
+
+	return this.queue('fx', function() {
+		var that = $(this),
+			originalStyleAttr = that.attr('style') || ' ',
+			originalStyle = filterStyles(getElementStyles.call(this)),
+			newStyle,
+			className = that.attr('className');
+
+		$.each(classAnimationActions, function(i, action) {
+			if (value[action]) {
+				that[action + 'Class'](value[action]);
+			}
+		});
+		newStyle = filterStyles(getElementStyles.call(this));
+		that.attr('className', className);
+
+		that.animate(styleDifference(originalStyle, newStyle), duration, easing, function() {
+			$.each(classAnimationActions, function(i, action) {
+				if (value[action]) { that[action + 'Class'](value[action]); }
+			});
+			// work around bug in IE by clearing the cssText before setting it
+			if (typeof that.attr('style') == 'object') {
+				that.attr('style').cssText = '';
+				that.attr('style').cssText = originalStyleAttr;
+			} else {
+				that.attr('style', originalStyleAttr);
+			}
+			if (callback) { callback.apply(this, arguments); }
+		});
+
+		// $.animate adds a function to the end of the queue
+		// but we want it at the front
+		var queue = $.queue(this),
+			anim = queue.splice(queue.length - 1, 1)[0];
+		queue.splice(1, 0, anim);
+		$.dequeue(this);
+	});
+};
+
+$.fn.extend({
+	_addClass: $.fn.addClass,
+	addClass: function(classNames, speed, easing, callback) {
+		return speed ? $.effects.animateClass.apply(this, [{ add: classNames },speed,easing,callback]) : this._addClass(classNames);
+	},
+
+	_removeClass: $.fn.removeClass,
+	removeClass: function(classNames,speed,easing,callback) {
+		return speed ? $.effects.animateClass.apply(this, [{ remove: classNames },speed,easing,callback]) : this._removeClass(classNames);
+	},
+
+	_toggleClass: $.fn.toggleClass,
+	toggleClass: function(classNames, force, speed, easing, callback) {
+		if ( typeof force == "boolean" || force === undefined ) {
+			if ( !speed ) {
+				// without speed parameter;
+				return this._toggleClass(classNames, force);
+			} else {
+				return $.effects.animateClass.apply(this, [(force?{add:classNames}:{remove:classNames}),speed,easing,callback]);
+			}
+		} else {
+			// without switch parameter;
+			return $.effects.animateClass.apply(this, [{ toggle: classNames },force,speed,easing]);
+		}
+	},
+
+	switchClass: function(remove,add,speed,easing,callback) {
+		return $.effects.animateClass.apply(this, [{ add: add, remove: remove },speed,easing,callback]);
+	}
+});
+
+
+
+/******************************************************************************/
+/*********************************** EFFECTS **********************************/
+/******************************************************************************/
+
+$.extend($.effects, {
+	version: "1.8.9",
+
+	// Saves a set of properties in a data storage
+	save: function(element, set) {
+		for(var i=0; i < set.length; i++) {
+			if(set[i] !== null) element.data("ec.storage."+set[i], element[0].style[set[i]]);
+		}
+	},
+
+	// Restores a set of previously saved properties from a data storage
+	restore: function(element, set) {
+		for(var i=0; i < set.length; i++) {
+			if(set[i] !== null) element.css(set[i], element.data("ec.storage."+set[i]));
+		}
+	},
+
+	setMode: function(el, mode) {
+		if (mode == 'toggle') mode = el.is(':hidden') ? 'show' : 'hide'; // Set for toggle
+		return mode;
+	},
+
+	getBaseline: function(origin, original) { // Translates a [top,left] array into a baseline value
+		// this should be a little more flexible in the future to handle a string & hash
+		var y, x;
+		switch (origin[0]) {
+			case 'top': y = 0; break;
+			case 'middle': y = 0.5; break;
+			case 'bottom': y = 1; break;
+			default: y = origin[0] / original.height;
+		};
+		switch (origin[1]) {
+			case 'left': x = 0; break;
+			case 'center': x = 0.5; break;
+			case 'right': x = 1; break;
+			default: x = origin[1] / original.width;
+		};
+		return {x: x, y: y};
+	},
+
+	// Wraps the element around a wrapper that copies position properties
+	createWrapper: function(element) {
+
+		// if the element is already wrapped, return it
+		if (element.parent().is('.ui-effects-wrapper')) {
+			return element.parent();
+		}
+
+		// wrap the element
+		var props = {
+				width: element.outerWidth(true),
+				height: element.outerHeight(true),
+				'float': element.css('float')
+			},
+			wrapper = $('<div></div>')
+				.addClass('ui-effects-wrapper')
+				.css({
+					fontSize: '100%',
+					background: 'transparent',
+					border: 'none',
+					margin: 0,
+					padding: 0
+				});
+
+		element.wrap(wrapper);
+		wrapper = element.parent(); //Hotfix for jQuery 1.4 since some change in wrap() seems to actually loose the reference to the wrapped element
+
+		// transfer positioning properties to the wrapper
+		if (element.css('position') == 'static') {
+			wrapper.css({ position: 'relative' });
+			element.css({ position: 'relative' });
+		} else {
+			$.extend(props, {
+				position: element.css('position'),
+				zIndex: element.css('z-index')
+			});
+			$.each(['top', 'left', 'bottom', 'right'], function(i, pos) {
+				props[pos] = element.css(pos);
+				if (isNaN(parseInt(props[pos], 10))) {
+					props[pos] = 'auto';
+				}
+			});
+			element.css({position: 'relative', top: 0, left: 0, right: 'auto', bottom: 'auto' });
+		}
+
+		return wrapper.css(props).show();
+	},
+
+	removeWrapper: function(element) {
+		if (element.parent().is('.ui-effects-wrapper'))
+			return element.parent().replaceWith(element);
+		return element;
+	},
+
+	setTransition: function(element, list, factor, value) {
+		value = value || {};
+		$.each(list, function(i, x){
+			unit = element.cssUnit(x);
+			if (unit[0] > 0) value[x] = unit[0] * factor + unit[1];
+		});
+		return value;
+	}
+});
+
+
+function _normalizeArguments(effect, options, speed, callback) {
+	// shift params for method overloading
+	if (typeof effect == 'object') {
+		callback = options;
+		speed = null;
+		options = effect;
+		effect = options.effect;
+	}
+	if ($.isFunction(options)) {
+		callback = options;
+		speed = null;
+		options = {};
+	}
+        if (typeof options == 'number' || $.fx.speeds[options]) {
+		callback = speed;
+		speed = options;
+		options = {};
+	}
+	if ($.isFunction(speed)) {
+		callback = speed;
+		speed = null;
+	}
+
+	options = options || {};
+
+	speed = speed || options.duration;
+	speed = $.fx.off ? 0 : typeof speed == 'number'
+		? speed : speed in $.fx.speeds ? $.fx.speeds[speed] : $.fx.speeds._default;
+
+	callback = callback || options.complete;
+
+	return [effect, options, speed, callback];
+}
+
+function standardSpeed( speed ) {
+	// valid standard speeds
+	if ( !speed || typeof speed === "number" || $.fx.speeds[ speed ] ) {
+		return true;
+	}
+	
+	// invalid strings - treat as "normal" speed
+	if ( typeof speed === "string" && !$.effects[ speed ] ) {
+		return true;
+	}
+	
+	return false;
+}
+
+$.fn.extend({
+	effect: function(effect, options, speed, callback) {
+		var args = _normalizeArguments.apply(this, arguments),
+			// TODO: make effects take actual parameters instead of a hash
+			args2 = {
+				options: args[1],
+				duration: args[2],
+				callback: args[3]
+			},
+			mode = args2.options.mode,
+			effectMethod = $.effects[effect];
+		
+		if ( $.fx.off || !effectMethod ) {
+			// delegate to the original method (e.g., .show()) if possible
+			if ( mode ) {
+				return this[ mode ]( args2.duration, args2.callback );
+			} else {
+				return this.each(function() {
+					if ( args2.callback ) {
+						args2.callback.call( this );
+					}
+				});
+			}
+		}
+		
+		return effectMethod.call(this, args2);
+	},
+
+	_show: $.fn.show,
+	show: function(speed) {
+		if ( standardSpeed( speed ) ) {
+			return this._show.apply(this, arguments);
+		} else {
+			var args = _normalizeArguments.apply(this, arguments);
+			args[1].mode = 'show';
+			return this.effect.apply(this, args);
+		}
+	},
+
+	_hide: $.fn.hide,
+	hide: function(speed) {
+		if ( standardSpeed( speed ) ) {
+			return this._hide.apply(this, arguments);
+		} else {
+			var args = _normalizeArguments.apply(this, arguments);
+			args[1].mode = 'hide';
+			return this.effect.apply(this, args);
+		}
+	},
+
+	// jQuery core overloads toggle and creates _toggle
+	__toggle: $.fn.toggle,
+	toggle: function(speed) {
+		if ( standardSpeed( speed ) || typeof speed === "boolean" || $.isFunction( speed ) ) {
+			return this.__toggle.apply(this, arguments);
+		} else {
+			var args = _normalizeArguments.apply(this, arguments);
+			args[1].mode = 'toggle';
+			return this.effect.apply(this, args);
+		}
+	},
+
+	// helper functions
+	cssUnit: function(key) {
+		var style = this.css(key), val = [];
+		$.each( ['em','px','%','pt'], function(i, unit){
+			if(style.indexOf(unit) > 0)
+				val = [parseFloat(style), unit];
+		});
+		return val;
+	}
+});
+
+
+
+/******************************************************************************/
+/*********************************** EASING ***********************************/
+/******************************************************************************/
+
 /*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
  *
@@ -307,45 +545,45 @@ var colors = {
  * to offer multiple easing options
  *
  * TERMS OF USE - jQuery Easing
- * 
- * Open source under the BSD License. 
- * 
- * Copyright © 2008 George McGinley Smith
+ *
+ * Open source under the BSD License.
+ *
+ * Copyright 2008 George McGinley Smith
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * 
- * Redistributions of source code must retain the above copyright notice, this list of 
+ *
+ * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list 
- * of conditions and the following disclaimer in the documentation and/or other materials 
+ * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
  * provided with the distribution.
- * 
- * Neither the name of the author nor the names of contributors may be used to endorse 
+ *
+ * Neither the name of the author nor the names of contributors may be used to endorse
  * or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
  * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
- * OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
 */
 
 // t: current time, b: begInnIng value, c: change In value, d: duration
-jQuery.easing['jswing'] = jQuery.easing['swing'];
+$.easing.jswing = $.easing.swing;
 
-jQuery.extend( jQuery.easing,
+$.extend($.easing,
 {
 	def: 'easeOutQuad',
 	swing: function (x, t, b, c, d) {
-		//alert(jQuery.easing.default);
-		return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
+		//alert($.easing.default);
+		return $.easing[$.easing.def](x, t, b, c, d);
 	},
 	easeInQuad: function (x, t, b, c, d) {
 		return c*(t/=d)*t + b;
@@ -449,12 +687,12 @@ jQuery.extend( jQuery.easing,
 		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
 	},
 	easeInOutBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158; 
+		if (s == undefined) s = 1.70158;
 		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
 		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
 	},
 	easeInBounce: function (x, t, b, c, d) {
-		return c - jQuery.easing.easeOutBounce (x, d-t, 0, c, d) + b;
+		return c - $.easing.easeOutBounce (x, d-t, 0, c, d) + b;
 	},
 	easeOutBounce: function (x, t, b, c, d) {
 		if ((t/=d) < (1/2.75)) {
@@ -468,41 +706,41 @@ jQuery.extend( jQuery.easing,
 		}
 	},
 	easeInOutBounce: function (x, t, b, c, d) {
-		if (t < d/2) return jQuery.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
+		if (t < d/2) return $.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
+		return $.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
 	}
 });
 
 /*
  *
  * TERMS OF USE - EASING EQUATIONS
- * 
- * Open source under the BSD License. 
- * 
- * Copyright © 2001 Robert Penner
+ *
+ * Open source under the BSD License.
+ *
+ * Copyright 2001 Robert Penner
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * 
- * Redistributions of source code must retain the above copyright notice, this list of 
+ *
+ * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list 
- * of conditions and the following disclaimer in the documentation and/or other materials 
+ * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
  * provided with the distribution.
- * 
- * Neither the name of the author nor the names of contributors may be used to endorse 
+ *
+ * Neither the name of the author nor the names of contributors may be used to endorse
  * or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
  * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
- * OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 

@@ -11,35 +11,48 @@ Website: www.buildinternet.com/project/supersized
 (function($){
 
 	//Resize image on ready or resize
-	$.fn.supersized = function() {
+	jQuery.fn.supersized = function(options) {
+	
+		var base_path = null;
+		var element = this;
+		
+		//Gather options
+		if ( options ) {
+			//Pull from both defaults and supplied options
+			var options = $.extend( {}, $.fn.supersized.defaults, options);
+		}else{
+			//Only pull from default settings
+			var options = $.extend( {}, $.fn.supersized.defaults);
+		}
 		
 		
 		$.inAnimation = false;
 		$.paused = false;
-		
-		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
 		$.currentSlide = options.start_slide - 1;
 		
 		/******Set up initial Images -- Add class doesnt work*****/
 		//Set previous image
 		var imageLink = (options.slides[options.slides.length - 1].url) ? "href='" + options.slides[options.slides.length - 1].url + "'" : "";
-		$("<img/>").attr("src", options.slides[options.slides.length - 1].image).appendTo("#supersized").wrap("<a " + imageLink + "></a>");//Doesnt account for start slide
+		$("<img/>").attr("src", options.slides[options.slides.length - 1].image).appendTo(element).wrap("<a " + imageLink + "></a>");//Doesnt account for start slide
 		
 		//Set current image
 		imageLink = (options.slides[$.currentSlide].url) ? "href='" + options.slides[$.currentSlide].url + "'" : "";
-		$("<img/>").attr("src", options.slides[$.currentSlide].image).appendTo("#supersized").wrap("<a class=\"activeslide\" " + imageLink + "></a>");
+		$("<img/>").attr("src", options.slides[$.currentSlide].image).appendTo(element).wrap("<a class=\"activeslide\" " + imageLink + "></a>");
 		
 		//Set next image
 		imageLink = (options.slides[$.currentSlide + 1].url) ? "href='" + options.slides[$.currentSlide + 1].url + "'" : "";
-		$("<img/>").attr("src", options.slides[$.currentSlide + 1].image).appendTo("#supersized").wrap("<a " + imageLink + "></a>");
+		$("<img/>").attr("src", options.slides[$.currentSlide + 1].image).appendTo(element).wrap("<a " + imageLink + "></a>");
 		
 		$(window).bind("load", function(){
 			
 			$('#loading').hide();
-			$('#supersized').fadeIn('fast');
+			element.fadeIn('fast');
 			
 			$('#controls-wrapper').show();
 			
+			
+			
+			//REVISIT
 			if (options.thumbnail_navigation == 1){
 			
 				/*****Set up thumbnails****/
@@ -53,9 +66,10 @@ Website: www.buildinternet.com/project/supersized
 		
 			}
 			
-			$('#supersized').resizenow();
+			resizenow(element, options);
 			
-			if (options.slide_captions == 1) $('#slidecaption').html(options.slides[$.currentSlide].title);//*********Pull caption from array
+			
+			if (options.slide_captions == 1) $('#slidecaption').html(options.slides[$.currentSlide].title); //Pull caption from array
 			if (options.navigation == 0) $('#navigation').hide();
 			if (options.thumbnail_navigation == 0){ $('#nextthumb').hide(); $('#prevthumb').hide(); }
 			
@@ -63,24 +77,24 @@ Website: www.buildinternet.com/project/supersized
 			if (options.slideshow == 1){
 				if (options.slide_counter == 1){ //Initiate slide counter if active
 					$('#slidecounter .slidenumber').html(options.start_slide);
-	    			$('#slidecounter .totalslides').html(options.slides.length); //*******Pull total from length of array
+	    			$('#slidecounter .totalslides').html(options.slides.length); //Pull total from length of array
 	    		}
-				slideshow_interval = setInterval(nextslide, options.slide_interval);
+				slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
 				
 				if (options.thumbnail_navigation == 1){
 					//Thumbnail Navigation
 					$('#nextthumb').click(function() {
 				    	if($.inAnimation) return false;
 					    clearInterval(slideshow_interval);
-					    nextslide();
-					    if(!($.paused)) slideshow_interval = setInterval(nextslide, options.slide_interval);
+					    nextslide(element, options);
+					    if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
 					    return false;
 				    });
 				    $('#prevthumb').click(function() {
 				    	if($.inAnimation) return false;
 				        clearInterval(slideshow_interval);
-				        prevslide();
-				       	if(!($.paused)) slideshow_interval = setInterval(nextslide, options.slide_interval);
+				        prevslide(element, options);
+				       	if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
 				        return false;
 				    });
 					}
@@ -90,22 +104,19 @@ Website: www.buildinternet.com/project/supersized
    						$(this).blur();  
    						return false;  
    					});
+   					 
    					 	
 					//Slide Navigation
+					
+					//Next Button
 				    $('#nextslide').click(function() {
 				    	if($.inAnimation) return false;
 					    clearInterval(slideshow_interval);
-					    nextslide();
-					    if(!($.paused)) slideshow_interval = setInterval(nextslide, options.slide_interval);
+					    nextslide(element, options);
+					    if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
 					    return false;
 				    });
-				    $('#prevslide').click(function() {
-				    	if($.inAnimation) return false;
-				        clearInterval(slideshow_interval);
-				        prevslide();
-				        if(!($.paused)) slideshow_interval = setInterval(nextslide, options.slide_interval);
-				        return false;
-				    });
+				    
 				    $('#nextslide').mousedown(function() {
 					   	$(this).attr("src", "img/forward.png");
 					});
@@ -115,6 +126,16 @@ Website: www.buildinternet.com/project/supersized
 					$('#nextslide').mouseout(function() {
 					    $(this).attr("src", "img/forward_dull.png");
 					});
+				    
+				    
+				    //Previous Button
+				    $('#prevslide').click(function() {
+				    	if($.inAnimation) return false;
+				        clearInterval(slideshow_interval);
+				        prevslide(element, options);
+				        if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
+				        return false;
+				    });
 					
 					$('#prevslide').mousedown(function() {
 					    $(this).attr("src", "img/back.png");
@@ -126,53 +147,70 @@ Website: www.buildinternet.com/project/supersized
 					    $(this).attr("src", "img/back_dull.png");
 					});
 					
+					
 				    //Play/Pause Button
 				    $('#pauseplay').click(function() {
 				    	if($.inAnimation) return false;
-				    	var src = ($(this).attr("src") === "img/play.png") ? "img/pause.png" : "img/play.png";
-      					if (src == "img/pause.png"){
-      						$(this).attr("src", "img/play.png");
+				    	var src = ($(this).attr("src") === "img/play_dull.png") ? "img/pause_dull.png" : "img/play_dull.png";
+      					if (src == "img/pause_dull.png"){
+      						$(this).attr("src", "img/play_dull.png");
       						$.paused = false;
-					        slideshow_interval = setInterval(nextslide, options.slide_interval);  
+					        slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);  
 				        }else{
-				        	$(this).attr("src", "img/pause.png");
+				        	$(this).attr("src", "img/pause_dull.png");
 				        	clearInterval(slideshow_interval);
 				        	$.paused = true;
 				        }
       					$(this).attr("src", src);
 					    return false;
 				    });
-				    $('#pauseplay').mouseover(function() {
-				    	var imagecheck = ($(this).attr("src") === "img/play_dull.png");
-				    	if (imagecheck){
-      						$(this).attr("src", "img/play.png"); 
-				        }else{
-				        	$(this).attr("src", "img/pause.png");
-				        }
-				    });
-				    
-				    $('#pauseplay').mouseout(function() {
-				    	var imagecheck = ($(this).attr("src") === "img/play.png");
-				    	if (imagecheck){
-      						$(this).attr("src", "img/play_dull.png"); 
-				        }else{
-				        	$(this).attr("src", "img/pause_dull.png");
-				        }
-				        return false;
-				    });
 				}
 			}
 		});
 				
 		$(document).ready(function() {
-			$('#supersized').resizenow(); 
+			resizenow(element, options);
+		});
+		
+		// Keyboard Navigation
+		$(document.documentElement).keyup(function (event) {
+			if (event.keyCode == 37) { //Left Arrow
+				if($.inAnimation) return false;
+				clearInterval(slideshow_interval);
+				prevslide(element, options);
+				if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
+				return false;
+			} else if (event.keyCode == 39) { //Right Arrow
+			    if($.inAnimation) return false;
+			    clearInterval(slideshow_interval);
+			    nextslide(element, options);
+			    if(!($.paused)) slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);
+			    return false;
+			} else if (event.keyCode == 32) { //Spacebar
+				var t = '#pauseplay';
+				if($.inAnimation) return false;
+		    	var src = ($(t).attr("src") === "img/play_dull.png") ? "img/pause_dull.png" : "img/play_dull.png";
+				
+				if (src == "img/pause_dull.png"){
+					$(t).attr("src", "img/play_dull.png");
+					$.paused = false;
+		        	slideshow_interval = setInterval(function(){ nextslide(element, options) }, options.slide_interval);  
+	        	}else{
+	        		$(t).attr("src", "img/pause_dull.png");
+	        		clearInterval(slideshow_interval);
+	        		$.paused = true;
+	       		}
+				
+				$(t).attr("src", src);
+			    return false;
+			}
 		});
 		
 		//Pause when hover on image
-		$('#supersized').hover(function() {
+		$(element).hover(function() {
 	   		if (options.slideshow == 1 && options.pause_hover == 1){
 	   			if(!($.paused) && options.navigation == 1){
-	   				$('#pauseplay').attr("src", "img/pause.png"); 
+	   				$('#pauseplay').attr("src", "img/pause_dull.png"); 
 	   				clearInterval(slideshow_interval);
 	   			}
 	   		}
@@ -188,27 +226,22 @@ Website: www.buildinternet.com/project/supersized
 	   	});
 		
 		$(window).bind("resize", function(){
-    		$('#supersized').resizenow(); 
+    		resizenow(element, options);  
 		});
 		
-		$('#supersized').hide();
+		element.hide();
 		$('#controls-wrapper').hide();
 	};
 	
 	//Adjust image size
-	$.fn.resizenow = function() {
-		var t = $(this);
-		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
+	function resizenow (element, options) {
+		var t = element;
 	  	return t.each(function() {
 	  		
 			//Define image ratio
-			var naturalHeight = t.find('.activeslide img').height();
-			var naturalWidth = t.find('.activeslide img').width();
-			var ratio = naturalHeight/naturalWidth;
+			var ratio = $('.activeslide img', t).height()/$('.activeslide img', t).width();
 			
 			//Gather browser and current image size
-			var imagewidth = t.width();
-			var imageheight = t.height();
 			var browserwidth = $(window).width();
 			var browserheight = $(window).height();
 			var offset;
@@ -225,44 +258,50 @@ Website: www.buildinternet.com/project/supersized
 			    t.children().width(browserwidth);
 			    t.children().height(browserwidth * ratio);
 			}
+			
+			//Vertically Center
 			if (options.vertical_center == 1){
 				t.children().css('left', (browserwidth - t.width())/2);
 				t.children().css('top', (browserheight - t.height())/2);
 			}
+			
 			return false;
 		});
 	};
 	
 		//Slideshow Next Slide
-	function nextslide() {
+	function nextslide(element, options) {
+		
 		if($.inAnimation) return false;
 		else $.inAnimation = true;
-	    var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
+	    
+	    var slides = options.slides;
 		
-		var currentslide = $('#supersized .activeslide');
-	    currentslide.removeClass('activeslide');
+		var currentslide = $(element).find('.activeslide');
+		currentslide.removeClass('activeslide');
 		
-	    if ( currentslide.length == 0 ) currentslide = $('#supersized a:last'); //*******Check if end of array?
+	    if ( currentslide.length == 0 ) currentslide = $(element).find('a:last'); //*******Check if end of array?
 			
-	    var nextslide =  currentslide.next().length ? currentslide.next() : $('#supersized a:first'); //*******Array
-	    var prevslide =  nextslide.prev().length ? nextslide.prev() : $('#supersized a:last'); //*******Array
+	    var nextslide =  currentslide.next().length ? currentslide.next() : $(element).find('a:first'); //*******Array
+		var prevslide =  nextslide.prev().length ? nextslide.prev() : $(element).find('a:last'); //*******Array
 		
 		$('.prevslide').removeClass('prevslide');
 		prevslide.addClass('prevslide');
 		
 		//Get the slide number of new slide
-		$.currentSlide + 1 == options.slides.length ? $.currentSlide = 0 : $.currentSlide++;
+		$.currentSlide + 1 == slides.length ? $.currentSlide = 0 : $.currentSlide++;
+		
 		
 		/**** Image Loading ****/
 		//Load next image
 		loadSlide=false;
-		$.currentSlide == options.slides.length - 1 ? loadSlide = 0 : loadSlide = $.currentSlide + 1;
+		$.currentSlide == slides.length - 1 ? loadSlide = 0 : loadSlide = $.currentSlide + 1;
 		imageLink = (options.slides[loadSlide].url) ? "href='" + options.slides[loadSlide].url + "'" : "";
-		$("<img/>").attr("src", options.slides[loadSlide].image).appendTo("#supersized").wrap("<a " + imageLink + "></a>");
+		$("<img/>").attr("src", options.slides[loadSlide].image).appendTo(element).wrap("<a " + imageLink + "></a>");
 		
 		if (options.thumbnail_navigation == 1){
 		//Load previous thumbnail
-		$.currentSlide - 1 < 0  ? prevThumb = options.slides.length - 1 : prevThumb = $.currentSlide - 1;
+		$.currentSlide - 1 < 0  ? prevThumb = slides.length - 1 : prevThumb = $.currentSlide - 1;
 		$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
 		
 		//Load next thumbnail
@@ -303,32 +342,38 @@ Website: www.buildinternet.com/project/supersized
 	    	if (options.transition == 5){
 	    		nextslide.show("slide", { direction: "left" }, 'slow', function(){$.inAnimation = false;});
 	    	}
-	    $('#supersized').resizenow();
+	    	
+	    resizenow(element, options);
 	}
 	
 	//Slideshow Previous Slide
-	function prevslide() {
-		if($.inAnimation) return false;
-		else $.inAnimation = true;
-		var options = $.extend($.fn.supersized.defaults, $.fn.supersized.options);
-	    
-	    var currentslide = $('#supersized .activeslide');
+	function prevslide(element, options) {
+	
+		if($.inAnimation) {
+			return false;
+		}else{
+			$.inAnimation = true;
+		}
+
+		var slides = options.slides;
+
+		var currentslide = $(element).find('.activeslide');
 	    currentslide.removeClass('activeslide');
 		
-	    if ( currentslide.length == 0 ) currentslide = $('#supersized a:first');
+	    if ( currentslide.length == 0 ) currentslide = $(element).find('a:first');
 			
-	    var nextslide =  currentslide.prev().length ? currentslide.prev() : $('#supersized a:last'); //****** If equal to total length of array
-	    var prevslide =  nextslide.next().length ? nextslide.next() : $('#supersized a:first');
+	    var nextslide =  currentslide.prev().length ? currentslide.prev() : $(element).find('a:last'); //****** If equal to total length of array
+		var prevslide =  nextslide.next().length ? nextslide.next() : $(element).find('a:first');
 				
 		//Get current slide number
-		$.currentSlide == 0 ?  $.currentSlide = options.slides.length - 1 : $.currentSlide-- ;
-		
+		$.currentSlide == 0 ?  $.currentSlide = slides.length - 1 : $.currentSlide-- ;
+				
 		/**** Image Loading ****/
 		//Load next image
 		loadSlide=false;
-		$.currentSlide - 1 < 0  ? loadSlide = options.slides.length - 1 : loadSlide = $.currentSlide - 1;
+		$.currentSlide - 1 < 0  ? loadSlide = slides.length - 1 : loadSlide = $.currentSlide - 1;
 		imageLink = (options.slides[loadSlide].url) ? "href='" + options.slides[loadSlide].url + "'" : "";
-		$("<img/>").attr("src", options.slides[loadSlide].image).prependTo("#supersized").wrap("<a " + imageLink + "></a>");
+		$("<img/>").attr("src", options.slides[loadSlide].image).prependTo(element).wrap("<a " + imageLink + "></a>");
 		
 		if (options.thumbnail_navigation == 1){
 		//Load previous thumbnail
@@ -336,7 +381,7 @@ Website: www.buildinternet.com/project/supersized
 		$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
 		
 		//Load next thumbnail
-		$.currentSlide == options.slides.length - 1 ? nextThumb = 0 : nextThumb = $.currentSlide + 1;
+		$.currentSlide == slides.length - 1 ? nextThumb = 0 : nextThumb = $.currentSlide + 1;
 		$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].image));
 		}
 		
@@ -377,7 +422,7 @@ Website: www.buildinternet.com/project/supersized
 	    		nextslide.show("slide", { direction: "right" }, 'slow', function(){$.inAnimation = false;});
 	    	}
 	    	
-	    	$('#supersized').resizenow();//Fix for resize mid-transition
+	    	resizenow(element, options);//Fix for resize mid-transition
 	}
 	
 	//Default Settings

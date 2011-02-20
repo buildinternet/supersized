@@ -1,8 +1,9 @@
 /*
-Supersized - Fullscreen Slideshow jQuery Plugin Stylesheet Version 3.0
-By Sam Dunn (www.buildinternet.com // www.onemightyroar.com)
-Version: supersized.3.1.js
-Website: www.buildinternet.com/project/supersized
+	Supersized - Fullscreen Slideshow jQuery Plugin Stylesheet
+	Version 3.1 Core
+	www.buildinternet.com/project/supersized
+	
+	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
 */
 
 	*{ margin:0; padding:0; }
@@ -12,12 +13,9 @@ Website: www.buildinternet.com/project/supersized
 	#page-wrapper{  width:100%; height:100%; position:absolute; top:0; overflow:auto; z-index:4; text-align:center; }
 	
 	/*Supersize Plugin Styles*/
-	#navigation{ float: right; margin:10px 20px 0 0; }
 	#loading { position: absolute; top: 49.5%; left: 49.5%; z-index: 10; width: 24px; height: 24px; text-indent: -999em; background-image: url(../img/progress.gif); }
 	
 	#supersized{ position:fixed; }
-		#supersized img{ -ms-interpolation-mode: bicubic; }
-		#supersized img, #supersized a{ outline:none; border:none; min-height:100%; min-width:100%; position:absolute; z-index: -1; }
-		#supersized .activeslide, #supersized .activeslide img{ z-index: 2; }
+		#supersized img{ outline:none; border:none; position:absolute; z-index: -1; -ms-interpolation-mode: bicubic; }
 
 		

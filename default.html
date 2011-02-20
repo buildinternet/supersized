@@ -21,23 +21,25 @@ Website: www.buildinternet.com/project/supersized
 	
 	<script type="text/javascript">  
 		$(function(){
-			$.fn.supersized.options = {
-				vertical_center: 1,
-				slideshow: 1,
-				navigation: 1,
-				thumbnail_navigation: 1,
-				transition: 1, //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
-				pause_hover: 0,
-				slide_counter: 1,
-				slide_captions: 1,
-				slide_interval: 3000,
-				slides : [
-					{image : 'slides/tower.jpg', title : 'City Clock Tower', url : 'http://www.flickr.com/photos/wumbus/4582735030/in/set-72157623876357531/'},
-					{image : 'slides/fence.jpg', title : 'Canal Park Fence', url : 'http://www.flickr.com/photos/wumbus/4582735030/sizes/l/in/set-72157623876357531/'},  
-					{image : 'slides/tracks.jpg', title : 'Old Train Tracks', url : 'http://www.flickr.com/photos/wumbus/4582733542/in/set-72157623876357531/'}
-				]
-			};
-	        $('#supersized').supersized(); 
+		
+			$('#supersized').supersized({
+				vertical_center         :   1,
+				slideshow               :   1,
+				navigation              :   1,
+				thumbnail_navigation    :   1,
+				transition              :   1, //0-None, 1-Fade, 2-slide top, 3-slide right, 4-slide bottom, 5-slide left
+				pause_hover             :   0,
+				slide_counter           :   1,
+				slide_captions          :   1,
+				slide_interval          :   3000,
+				start_slide             :   1,
+				slides 					:  	[  //Slideshow Images
+												{image : 'slides/tower.jpg', title : 'City Clock Tower', url : 'http://www.flickr.com/photos/wumbus/4582735030/in/set-72157623876357531/'},
+												{image : 'slides/fence.jpg', title : 'Canal Park Fence', url : 'http://www.flickr.com/photos/wumbus/4582735030/sizes/l/in/set-72157623876357531/'},  
+												{image : 'slides/tracks.jpg', title : 'Old Train Tracks', url : 'http://www.flickr.com/photos/wumbus/4582733542/in/set-72157623876357531/'}
+											]
+			});
+			 
 	    });
 	</script>
 	
