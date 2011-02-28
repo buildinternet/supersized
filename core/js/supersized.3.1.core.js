@@ -4,7 +4,7 @@
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
-	Released under MIT License
+	Released under MIT License / GPL License
 */
 
 (function($){
