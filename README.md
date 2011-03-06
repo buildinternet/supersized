@@ -4,10 +4,23 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+3/5/11 - Supersized 3.1.1 and Supersized Flickr 1.1 Updates and Fixes
+
+	*Smoother slide transitions (no longer uses the slide function)
+	*Files "effects.core.min.js" and "effects.slide.min.js" are no longer required
+	*Fixed overlapping images when sliding
+	*Fixed image resizing for slideshows with only 1 image
+	*Path for navigation button images is now defined in options
+	*Added option for basic JS image protection against right click/dragging
+	*Random start slides now possible in Slideshows (0 is random)
+	*Updated default #supersized-loader CSS and animated GIF to work better on light and dark backgrounds
+
+
 2/27/11 - Updates to project page and licenses
 	
 	*Supersized 3.1 is licensed under either the MIT or GPL License
 	*Demos and documentation can now be found at the project page (http://buildinternet.com/project/supersized)
+
 
 2/26/11 - Supersized 3.1 and Supersized Flickr 1.0 Released
 

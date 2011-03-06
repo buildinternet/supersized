@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version 3.1
+	Flickr Edition Version 1.1
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -23,7 +23,7 @@
 			//Functionality
 			slideshow               :   1,		//Slideshow on/off
 			autoplay				:	1,		//Slideshow starts playing automatically
-			start_slide             :   1,		//Start slide
+			start_slide             :   1,		//Start slide (0 is random)
 			slide_interval          :   5000,	//Length between transitions
 			transition              :   1, 		//0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
 			transition_speed		:	750,	//Speed of transition
@@ -31,6 +31,8 @@
 			pause_hover             :   0,		//Pause slideshow on hover
 			keyboard_nav            :   1,		//Keyboard navigation on/off
 			performance				:	1,		//0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
+			image_protect			:	1,		//Disables image dragging and right click with Javascript
+			image_path				:	'img/', //Default image path
 			
 			//Size & Position
 			min_width		        :   0,		//Min width allowed (in pixels)
@@ -48,9 +50,9 @@
 			
 			//Flickr
 			source					:	2,		//1-Set, 2-User, 3-Group
-			set                     :   false, 	//Flickr set ID (found in URL)
-			user					:	false,	//Flickr user ID (http://idgettr.com/)
-			group					:	false, 	//Flickr group ID (http://idgettr.com/)
+			set                     :   '###', 	//Flickr set ID (found in URL)
+			user					:	'###',	//Flickr user ID (http://idgettr.com/)
+			group					:	'###', 	//Flickr group ID (http://idgettr.com/)
 			total_slides			:	100,	//How many pictures to pull (Between 1-500)
 			image_size              :   'z',	//Flickr image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
 			slides 					: 	[{}],	//Initiate slides array
@@ -67,9 +69,6 @@
 		var element = $('#supersized');		//Supersized container
 		var pauseplay = '#pauseplay';		//Pause/Play
 		
-		//Default image path for navigation control buttons
-		var image_path = 'img/';
-		
 		
 		//Combine options with default settings
 		if (options) {
@@ -81,7 +80,14 @@
 		//General slideshow variables
 		var inAnimation = false;	//Prevents animations from stacking
 		var isPaused = false;	//Tracks paused on/off
-		var currentSlide = options.start_slide - 1;	//Starting slide
+		var image_path = options.image_path;		//Default image path for navigation control buttons
+		
+		//Determine starting slide (random or defined)
+		if (options.start_slide){
+			var currentSlide = options.start_slide - 1;	//Default to defined start slide
+		}else{
+			var currentSlide = Math.floor(Math.random()*options.total_slides);	//Generate random slide number based on total slides defined
+		}
 		
 		//If links should open in new window
 		var linkTarget = options.new_window ? ' target="_blank"' : '';
@@ -134,20 +140,26 @@
     			    
     			 });
     			
+    			
     			/***Load initial set of images***/
-
-				//Set previous image
-				currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
-				var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
-				$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+    			
+				if (options.slides.length > 1){
+					//Set previous image
+					currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
+					var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
 				
 				//Set current image
 				imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
 				$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
-				
-				//Set next image
-				imageLink = (options.slides[currentSlide + 1].url) ? "href='" + options.slides[currentSlide + 1].url + "'" : "";
-				$("<img/>").attr("src", options.slides[currentSlide + 1].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+			
+				if (options.slides.length > 1){
+					//Set next image
+					currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
+					imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
 				
 				/***End load initial images***/
     			 
@@ -188,7 +200,7 @@
 			
 				if (options.slide_counter){	//Initiate slide counter if active
 					
-					$('#slidecounter .slidenumber').html(options.start_slide);		//Pull initial slide number from options		
+					$('#slidecounter .slidenumber').html(currentSlide + 1);		//Pull initial slide number from options		
 	    			$('#slidecounter .totalslides').html(options.slides.length);	//Pull total from length of array
 	    		
 	    		}
@@ -495,6 +507,18 @@
 					
 				});
 				
+				//Basic image drag and right click protection
+				if (options.image_protect){
+					
+					$('img', element).bind("contextmenu",function(){
+						return false;
+					});
+					$('img', element).bind("mousedown",function(){
+						return false;
+					});
+				
+				}
+				
 				return false;
 				
 			});
@@ -574,28 +598,28 @@
 	    		    nextslide.fadeTo(options.transition_speed, 1, function(){ afterAnimation(); });
 	    		    break;
 	    		case 2:    //Slide Top
-	    		    nextslide.show("slide", { direction: "up" }, options.transition_speed, function(){ afterAnimation(); });
+	    		    nextslide.animate({top : -$(window).height()}, 0 ).show().animate({ top:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    		    break;
 	    		case 3:    //Slide Right
-	    			nextslide.show("slide", { direction: "right" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 4:    //Slide Bottom
-	    			nextslide.show("slide", { direction: "down" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({top : $(window).height()}, 0 ).show().animate({ top:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 5:    //Slide Left
-	    			nextslide.show("slide", { direction: "left" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 6:    //Carousel Right
-	    			nextslide.show("slide", { direction: "right" }, options.transition_speed, function(){ afterAnimation(); });
-					currentslide.hide("slide", { direction: "left" }, options.transition_speed);
+	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
+					currentslide.animate({ left: -$(window).width() }, options.transition_speed );
 	    			break;
 	    		case 7:    //Carousel Left
-	    			nextslide.show("slide", { direction: "left" }, options.transition_speed, function(){ afterAnimation(); });
-					currentslide.hide("slide", { direction: "right" }, options.transition_speed);
+	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
+					currentslide.animate({ left: $(window).width() }, options.transition_speed );
 	    			break;
+	    	
 	    	};
-		    	
-		    resizenow();
+
 		    
 		}
 		
@@ -672,28 +696,27 @@
 	    		    nextslide.fadeTo(options.transition_speed, 1, function(){ afterAnimation(); });
 	    		    break;
 	    		case 2:    //Slide Top (reverse)
-	    		    nextslide.show("slide", { direction: "down" }, options.transition_speed, function(){ afterAnimation(); });
+	    		    nextslide.animate({top : $(window).height()}, 0 ).show().animate({ top:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    		    break;
 	    		case 3:    //Slide Right (reverse)
-	    			nextslide.show("slide", { direction: "left" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 4:    //Slide Bottom (reverse)
-	    			nextslide.show("slide", { direction: "up" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({top : -$(window).height()}, 0 ).show().animate({ top:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 5:    //Slide Left (reverse)
-	    			nextslide.show("slide", { direction: "right" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 	    			break;
 	    		case 6:    //Carousel Right (reverse)
-	    			nextslide.show("slide", { direction: "left" }, options.transition_speed, function(){ afterAnimation(); });
-					currentslide.hide("slide", { direction: "right" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
+					currentslide.animate({ left: $(window).width() }, options.transition_speed );
 	    			break;
 	    		case 7:    //Carousel Left (reverse)
-	    			nextslide.show("slide", { direction: "right" }, options.transition_speed, function(){ afterAnimation(); });
-					currentslide.hide("slide", { direction: "left" }, options.transition_speed, function(){ afterAnimation(); });
+	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
+					currentslide.animate({ left: -$(window).width() }, options.transition_speed );
 	    			break;	
+	    	
 	    	};
-	    				
-		    resizenow();
 		    	
 		}
 		
@@ -706,6 +729,8 @@
 			if (options.performance == 1){
 		    	element.removeClass('speed').addClass('quality');
 			}
+			
+			resizenow();
 			
 		}
 		

@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Background jQuery Plugin
-	Version 3.1 Core
+	Version 3.1.1 Core
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -25,7 +25,8 @@
 			min_width		        :   0,		//Min width allowed (in pixels)
 			min_height		        :   0,		//Min height allowed (in pixels)
 			fit_portrait         	:   0,		//Portrait images will not exceed browser height
-			fit_landscape			:   0		//Landscape images will not exceed browser width
+			fit_landscape			:   0,		//Landscape images will not exceed browser width
+			image_protect			:	1		//Disables image dragging and right click with Javascript
     	};
 		
 		var element = $('#supersized');		//Define element for Supersized
@@ -117,6 +118,18 @@
 					}
 					
 				});
+				
+				//Basic image drag and right click protection
+				if (options.image_protect){
+					
+					$('img', element).bind("contextmenu",function(){
+						return false;
+					});
+					$('img', element).bind("mousedown",function(){
+						return false;
+					});
+				
+				}
 				
 				return false;
 				

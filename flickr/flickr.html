@@ -4,7 +4,7 @@
 
 	<!--
 	Supersized - Fullscreen Background jQuery Plugin
-	Flickr Edition Version 1.0
+	Flickr Edition Version 1.1
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -19,9 +19,7 @@
 	<link rel="stylesheet" href="css/supersized.css" type="text/css" media="screen" />
 	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-	<script type="text/javascript" src="js/effects.core.min.js"></script>
-	<script type="text/javascript" src="js/effects.slide.min.js"></script>
-	<script type="text/javascript" src="js/supersized.flickr.1.0.js"></script>
+	<script type="text/javascript" src="js/supersized.flickr.1.1.js"></script>
 	
 	<script type="text/javascript">
 	
@@ -31,7 +29,7 @@
 				//Functionality
 				slideshow               :   1,		//Slideshow on/off
 				autoplay				:	1,		//Slideshow starts playing automatically
-				start_slide             :   1,		//Start slide
+				start_slide             :   1,		//Start slide (0 is random)
 				slide_interval          :   5000,	//Length between transitions
 				transition              :   1, 		//0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
 				transition_speed		:	750,	//Speed of transition
@@ -39,6 +37,8 @@
 				pause_hover             :   0,		//Pause slideshow on hover
 				keyboard_nav            :   1,		//Keyboard navigation on/off
 				performance				:	1,		//0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
+				image_protect			:	1,		//Disables image dragging and right click with Javascript
+				image_path				:	'img/', //Default image path
 				
 				//Size & Position
 				min_width		        :   0,		//Min width allowed (in pixels)
@@ -56,9 +56,9 @@
 				
 				//Flickr
 				source					:	3,						//1-Set, 2-User, 3-Group
-				set                     :   '72157624348037346', 	//Flickr set ID (found in URL)
-				user					:	'47269749@N07',			//Flickr user ID (http://idgettr.com/)
-				group					:	'1505190@N25', 			//Flickr group ID (http://idgettr.com/)
+				set                     :   '######', 				//Flickr set ID (found in URL)
+				user					:	'######',				//Flickr user ID (http://idgettr.com/)
+				group					:	'######', 				//Flickr group ID (http://idgettr.com/)
 				total_slides			:	100,					//How many pictures to pull (Between 1-500)
 				image_size              :   'z', 					//Flickr Image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
 				
@@ -66,7 +66,7 @@
 	    		FLICKR API KEY
 	    		NEED TO GET YOUR OWN -- http://www.flickr.com/services/apps/create/
 	    		**/
-				api_key					:	'#############'		//Flickr API Key
+				api_key					:	'########'		//Flickr API Key
 					
 			}); 
 		});
