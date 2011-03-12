@@ -4,6 +4,12 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+3/11/11 - Supersized 3.1.2 Updates (All editions)
+
+	*Added option for random slide order
+	*Updated min_height and min_width performance
+
+
 3/5/11 - Supersized 3.1.1 and Supersized Flickr 1.1 Updates and Fixes
 
 	*Smoother slide transitions (no longer uses the slide function)

@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version 3.1.1
+	Version 3.1.2
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -14,7 +14,7 @@ body { background:#111; }
 	#supersized-loader { position:absolute; top:50%; left:50%; z-index:10; width:60px; height:60px; margin:-30px 0 0 -30px; text-indent:-999em; background-color:#111; background:rgba(0,0,0,0.8) url(../img/progress.gif) no-repeat center center; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 	
 	#supersized { position:fixed; left:0; top:0; overflow:hidden; z-index:-999; height:100%; width:100%; }
-		#supersized img{ position:relative; display:none; outline:none; border:none; }
+		#supersized img{ width:auto; height:auto; position:relative; display:none; outline:none; border:none; }
 			#supersized.speed img { -ms-interpolation-mode:nearest-neighbor; image-rendering: -moz-crisp-edges; }	/*Speed*/
 			#supersized.quality img { -ms-interpolation-mode:bicubic; image-rendering: optimizeQuality; }			/*Quality*/
 		

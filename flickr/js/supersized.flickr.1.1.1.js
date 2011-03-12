@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version 3.1.1
+	Flickr Edition Version 1.1.1
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -24,6 +24,7 @@
 			slideshow               :   1,		//Slideshow on/off
 			autoplay				:	1,		//Slideshow starts playing automatically
 			start_slide             :   1,		//Start slide (0 is random)
+			random					: 	0,		//Randomize slide order (Ignores start slide)
 			slide_interval          :   5000,	//Length between transitions
 			transition              :   1, 		//0-None, 1-Fade, 2-Slide Top, 3-Slide Right, 4-Slide Bottom, 5-Slide Left, 6-Carousel Right, 7-Carousel Left
 			transition_speed		:	750,	//Speed of transition
@@ -46,13 +47,29 @@
 			navigation              :   1,		//Slideshow controls on/off
 			thumbnail_navigation    :   0,		//Thumbnail navigation
 			slide_counter           :   1,		//Display slide numbers
-			slide_captions          :   1		//Slide caption (Pull from "title" in slides array)
+			slide_captions          :   1,		//Slide caption (Pull from "title" in slides array)
+			
+			//Flickr
+			source					:	2,		//1-Set, 2-User, 3-Group
+			set                     :   '###', 	//Flickr set ID (found in URL)
+			user					:	'###',	//Flickr user ID (http://idgettr.com/)
+			group					:	'###', 	//Flickr group ID (http://idgettr.com/)
+			total_slides			:	100,	//How many pictures to pull (Between 1-500)
+			image_size              :   'z',	//Flickr image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
+			slides 					: 	[{}],	//Initiate slides array
+    	
+    		/**
+    		FLICKR API KEY
+    		NEED TO GET YOUR OWN -- http://www.flickr.com/services/apps/create/ 
+    		**/
+			api_key					:	'#############'		//Flickr API Key
 			
     	};
 		
 		//Default elements
 		var element = $('#supersized');		//Supersized container
 		var pauseplay = '#pauseplay';		//Pause/Play
+		
 		
 		//Combine options with default settings
 		if (options) {
@@ -62,15 +79,15 @@
 		}
 		
 		//General slideshow variables
-		var inAnimation = false;					//Prevents animations from stacking
-		var isPaused = false;						//Tracks paused on/off
+		var inAnimation = false;	//Prevents animations from stacking
+		var isPaused = false;	//Tracks paused on/off
 		var image_path = options.image_path;		//Default image path for navigation control buttons
 		
 		//Determine starting slide (random or defined)
 		if (options.start_slide){
 			var currentSlide = options.start_slide - 1;	//Default to defined start slide
 		}else{
-			var currentSlide = Math.floor(Math.random()*options.slides.length);	//Generate random slide number
+			var currentSlide = Math.floor(Math.random()*options.total_slides);	//Generate random slide number based on total slides defined
 		}
 		
 		//If links should open in new window
@@ -81,29 +98,81 @@
 			element.addClass('speed'); 		//Faster transitions
 		} else if ((options.performance == 1) || (options.performance == 2)){
 			element.addClass('quality');	//Higher image quality
-		}
-		
-		
-		/***Load initial set of images***/
+		}    	
+    	
+    	//Determine where to pull images from
+    	switch(options.source){
+		    		
+	    	case 1:		//From a Set
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&format=json&jsoncallback=?';
+	    		break;
+	    	case 2:		//From a User
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		break;
+	    	case 3:		//From a Group
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		break;
+	    		
+	    }
+    	
+		$.ajax({ //request to Flickr
+			type: 'GET',  
+  			url: flickrURL,  
+  			dataType: 'json', 
+  			async: true,  
+  			success: function(data){
+				
+				//Check if images are from a set
+				var flickrResults = (options.source == 1) ? data.photoset.photo : data.photos.photo;
+				
+    			//Build slides array from flickr request
+    			$.each(flickrResults, function(i,item){
+    			
+    			    //create image urls
+    			    var photoURL = 'http://farm' + item.farm + '.static.flickr.com/' + item.server + '/' + item.id + '_' + item.secret + '_' + options.image_size + '.jpg';
+    			    var thumbURL = 'http://farm' + item.farm + '.static.flickr.com/' + item.server + '/' + item.id + '_' + item.secret + '_t.jpg';
+    			   	var	photoLink = "http://www.flickr.com/photos/" + item.owner + "/" + item.id + "/";
+    			   	
+    			    if (i == 0){
+    			    	options.slides.splice(0,1,{ image : photoURL, thumb : thumbURL, title : item.title , url : photoLink });
+    			    }else{
+    			    	options.slides.push({ image : photoURL, thumb : thumbURL, title : item.title , url : photoLink });
+    			    }
+    			    
+    			 });
+    			
+    			//Shuffle slide order if needed		
+				if (options.random){
+					arr = options.slides;
+					for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);	//Fisher-Yates shuffle algorithm (jsfromhell.com/array/shuffle)
+				    options.slides = arr;
+				}
+    			
+    			/***Load initial set of images***/
+    			
+				if (options.slides.length > 1){
+					//Set previous image
+					currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
+					var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
+				
+				//Set current image
+				imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
+				$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
+			
+				if (options.slides.length > 1){
+					//Set next image
+					currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
+					imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
+				
+				/***End load initial images***/
+    			 
+    		}//End AJAX Callback 
+    	 });
 
-		if (options.slides.length > 1){
-			//Set previous image
-			currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
-			var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
-			$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
-		}
-		
-		//Set current image
-		imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
-		$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
-		
-		if (options.slides.length > 1){
-			//Set next image
-			currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
-			imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
-			$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
-		}
-		/***End load initial images***/
 		
 		element.hide();					//Hide image to be faded in
 		$('#controls-wrapper').hide();	//Hide controls to be displayed
@@ -115,15 +184,15 @@
 			$('#controls-wrapper').show();		//Display controls
 			
 			//Display thumbnails
-			if (options.thumbnail_navigation){
+			if (options.thumbnail_navigation == 1){
 			
 				//Load previous thumbnail
 				currentSlide - 1 < 0  ? prevThumb = options.slides.length - 1 : prevThumb = currentSlide - 1;
-				$('#prevthumb').show().html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').show().html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 				
 				//Load next thumbnail
 				currentSlide == options.slides.length - 1 ? nextThumb = 0 : nextThumb = currentSlide + 1;
-				$('#nextthumb').show().html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').show().html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 		
 			}
 			
@@ -134,7 +203,7 @@
 			
 			
 			//Start slideshow if enabled
-			if (options.slideshow && options.slides.length > 1){
+			if (options.slideshow){
 			
 				if (options.slide_counter){	//Initiate slide counter if active
 					
@@ -200,7 +269,7 @@
 				    	if(inAnimation) return false;		//Abort if currently animating
 				    	
 					    clearInterval(slideshow_interval);	//Stop slideshow
-					    nextslide();		//Go to next slide
+					    nextslide(element, options);		//Go to next slide
 					    if(!(isPaused)) slideshow_interval = setInterval(nextslide, options.slide_interval);	//If not paused, resume slideshow
 					    
 					    return false;
@@ -228,7 +297,7 @@
 				    	if(inAnimation) return false;		//Abort if currently animating
 				    	
 					    clearInterval(slideshow_interval);	//Stop slideshow
-					    prevslide();		//Go to previous slide
+					    prevslide(element, options);		//Go to previous slide
 					    if(!(isPaused)) slideshow_interval = setInterval(nextslide, options.slide_interval);	//If not paused, resume slideshow
 					    
 					    return false;
@@ -398,39 +467,113 @@
 		  		
 		  		//Resize each image seperately
 		  		$(t).each(function(){
+		  		
 					var ratio = ($(this).height()/$(this).width()).toFixed(2);	//Define image ratio
+					thisSlide = $(this);
 					
 					//Gather browser size
 					var browserwidth = $(window).width();
 					var browserheight = $(window).height();
 					var offset;
 					
-					//Resize image to proper ratio
-					if ((browserheight > options.min_height) || (browserwidth > options.min_width)){	//If window larger than minimum height or width
+					/**Resize image to proper ratio**/
+					
+					if ((browserheight <= options.min_height) && (browserwidth <= options.min_width)){	//If window smaller than minimum width and height
+					
+						if ((browserheight/browserwidth) > ratio){
+							options.fit_landscape && ratio <= 1 ? resizeWidth(true) : resizeHeight(true);	//If landscapes are set to fit
+						} else {
+							options.fit_portrait && ratio > 1 ? resizeHeight(true) : resizeWidth(true);		//If portraits are set to fit
+						}
+					
+					} else if (browserwidth <= options.min_width){		//If window only smaller than minimum width
+					
+						if ((browserheight/browserwidth) > ratio){
+							options.fit_landscape && ratio <= 1 ? resizeWidth(true) : resizeHeight();	//If landscapes are set to fit
+						} else {
+							options.fit_portrait && ratio > 1 ? resizeHeight() : resizeWidth(true);		//If portraits are set to fit
+						}
+						
+					} else if (browserheight <= options.min_height){	//If window only smaller than minimum height
+					
+						if ((browserheight/browserwidth) > ratio){
+							options.fit_landscape && ratio <= 1 ? resizeWidth() : resizeHeight(true);	//If landscapes are set to fit
+						} else {
+							options.fit_portrait && ratio > 1 ? resizeHeight(true) : resizeWidth();		//If portraits are set to fit
+						}
+					
+					} else {	//If larger than minimums
 						
 						if ((browserheight/browserwidth) > ratio){
-							
-							if (options.fit_landscape && ratio <= 1){	//If landscapes are set to fit
-					    		$(this).width(browserwidth);
-					    		$(this).height(browserwidth * ratio);
-							}else{										//Otherwise handle normally
-								$(this).height(browserheight);
-							    $(this).width(browserheight / ratio);
-							}
-						
+							options.fit_landscape && ratio <= 1 ? resizeWidth() : resizeHeight();	//If landscapes are set to fit
 						} else {
+							options.fit_portrait && ratio > 1 ? resizeHeight() : resizeWidth();		//If portraits are set to fit
+						}
 						
-							if (options.fit_portrait && ratio > 1){	//If portraits are set to fit
-								$(this).height(browserheight);
-							    $(this).width(browserheight / ratio);
-							}else{										//Otherwise handle normally
-								$(this).width(browserwidth);
-						    	$(this).height(browserwidth * ratio);
+					}
+					
+					/**End Image Resize**/
+					
+					
+					/**Resize Functions**/
+					
+					function resizeWidth(minimum){
+						if (minimum){	//If minimum height needs to be considered
+							if(thisSlide.width() < browserwidth || thisSlide.width() < options.min_width ){
+								if (thisSlide.width() * ratio >= options.min_height){
+									thisSlide.width(options.min_width);
+						    		thisSlide.height(thisSlide.width() * ratio);
+						    	}else{
+						    		resizeHeight();
+						    	}
+						    }
+						}else{
+							if (options.min_height >= browserheight && !options.fit_landscape){	//If minimum height needs to be considered
+								if (browserwidth * ratio >= options.min_height || (browserwidth * ratio >= options.min_height && ratio <= 1)){	//If resizing would push below minimum height or image is a landscape
+									thisSlide.width(browserwidth);
+									thisSlide.height(browserwidth * ratio);
+								} else if (ratio > 1){		//Else the image is portrait
+									thisSlide.height(options.min_height);
+									thisSlide.width(thisSlide.height() / ratio);
+								} else if (thisSlide.width() < browserwidth) {
+									thisSlide.width(browserwidth);
+						    		thisSlide.height(thisSlide.width() * ratio);
+								}
+							}else{	//Otherwise, resize as normal
+								thisSlide.width(browserwidth);
+								thisSlide.height(browserwidth * ratio);
 							}
-						
-						}	//End dynamic resizing
-						
-					}	//End minimum size check
+						}
+					};
+					
+					function resizeHeight(minimum){
+						if (minimum){	//If minimum height needs to be considered
+							if(thisSlide.height() < browserheight){
+								if (thisSlide.height() / ratio >= options.min_width){
+									thisSlide.height(options.min_height);
+									thisSlide.width(thisSlide.height() / ratio);
+								}else{
+									resizeWidth(true);
+								}
+							}
+						}else{	//Otherwise, resized as normal
+							if (options.min_width >= browserwidth){	//If minimum width needs to be considered
+								if (browserheight / ratio >= options.min_width || ratio > 1){	//If resizing would push below minimum width or image is a portrait
+									thisSlide.height(browserheight);
+									thisSlide.width(browserheight / ratio);
+								} else if (ratio <= 1){		//Else the image is landscape
+									thisSlide.width(options.min_width);
+						    		thisSlide.height(thisSlide.width() * ratio);
+								}
+							}else{	//Otherwise, resize as normal
+								thisSlide.height(browserheight);
+								thisSlide.width(browserheight / ratio);
+							}
+						}
+					};
+					
+					/**End Resize Functions**/
+					
 					
 					//Horizontally Center
 					if (options.horizontal_center){
@@ -501,11 +644,11 @@
 			
 				//Load previous thumbnail
 				currentSlide - 1 < 0  ? prevThumb = slides.length - 1 : prevThumb = currentSlide - 1;
-				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 			
 				//Load next thumbnail
 				nextThumb = loadSlide;
-				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 				
 			}
 			
@@ -554,9 +697,9 @@
 	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 					currentslide.animate({ left: $(window).width() }, options.transition_speed );
 	    			break;
+	    	
 	    	};
-		    	
-		    
+
 		    
 		}
 		
@@ -600,11 +743,11 @@
 			
 				//Load previous thumbnail
 				prevThumb = loadSlide;
-				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 				
 				//Load next thumbnail
 				currentSlide == slides.length - 1 ? nextThumb = 0 : nextThumb = currentSlide + 1;
-				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 			}
 			
 			currentslide.next().remove(); //Remove Old Image
@@ -652,6 +795,7 @@
 	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 					currentslide.animate({ left: -$(window).width() }, options.transition_speed );
 	    			break;	
+	    	
 	    	};
 		    	
 		}
