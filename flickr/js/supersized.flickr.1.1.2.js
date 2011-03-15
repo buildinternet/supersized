@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version 3.1.2
+	Flickr Edition Version 1.1.2
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -47,13 +47,29 @@
 			navigation              :   1,		//Slideshow controls on/off
 			thumbnail_navigation    :   0,		//Thumbnail navigation
 			slide_counter           :   1,		//Display slide numbers
-			slide_captions          :   1		//Slide caption (Pull from "title" in slides array)
+			slide_captions          :   1,		//Slide caption (Pull from "title" in slides array)
+			
+			//Flickr
+			source					:	2,		//1-Set, 2-User, 3-Group
+			set                     :   '###', 	//Flickr set ID (found in URL)
+			user					:	'###',	//Flickr user ID (http://idgettr.com/)
+			group					:	'###', 	//Flickr group ID (http://idgettr.com/)
+			total_slides			:	100,	//How many pictures to pull (Between 1-500)
+			image_size              :   'z',	//Flickr image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
+			slides 					: 	[{}],	//Initiate slides array
+    	
+    		/**
+    		FLICKR API KEY
+    		NEED TO GET YOUR OWN -- http://www.flickr.com/services/apps/create/ 
+    		**/
+			api_key					:	'#############'		//Flickr API Key
 			
     	};
 		
 		//Default elements
 		var element = $('#supersized');		//Supersized container
 		var pauseplay = '#pauseplay';		//Pause/Play
+		
 		
 		//Combine options with default settings
 		if (options) {
@@ -63,15 +79,15 @@
 		}
 		
 		//General slideshow variables
-		var inAnimation = false;					//Prevents animations from stacking
-		var isPaused = false;						//Tracks paused on/off
+		var inAnimation = false;	//Prevents animations from stacking
+		var isPaused = false;	//Tracks paused on/off
 		var image_path = options.image_path;		//Default image path for navigation control buttons
 		
 		//Determine starting slide (random or defined)
 		if (options.start_slide){
 			var currentSlide = options.start_slide - 1;	//Default to defined start slide
 		}else{
-			var currentSlide = Math.floor(Math.random()*options.slides.length);	//Generate random slide number
+			var currentSlide = Math.floor(Math.random()*options.total_slides);	//Generate random slide number based on total slides defined
 		}
 		
 		//If links should open in new window
@@ -82,38 +98,89 @@
 			element.addClass('speed'); 		//Faster transitions
 		} else if ((options.performance == 1) || (options.performance == 2)){
 			element.addClass('quality');	//Higher image quality
-		}
-		
-		//Shuffle slide order if needed		
-		if (options.random){
-			arr = options.slides;
-			for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);	//Fisher-Yates shuffle algorithm (jsfromhell.com/array/shuffle)
-		    options.slides = arr;
-		}
-		
-		/***Load initial set of images***/
+		}    	
+    	
+    	//Determine where to pull images from
+    	switch(options.source){
+		    		
+	    	case 1:		//From a Set
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&format=json&jsoncallback=?';
+	    		break;
+	    	case 2:		//From a User
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		break;
+	    	case 3:		//From a Group
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		break;
+	    		
+	    }
+    	
+		$.ajax({ //request to Flickr
+			type: 'GET',  
+  			url: flickrURL,  
+  			dataType: 'json', 
+  			async: true,  
+  			success: function(data){
+				
+				//Check if images are from a set
+				var flickrResults = (options.source == 1) ? data.photoset.photo : data.photos.photo;
+				
+    			//Build slides array from flickr request
+    			$.each(flickrResults, function(i,item){
+    			
+    			    //create image urls
+    			    var photoURL = 'http://farm' + item.farm + '.static.flickr.com/' + item.server + '/' + item.id + '_' + item.secret + '_' + options.image_size + '.jpg';
+    			    var thumbURL = 'http://farm' + item.farm + '.static.flickr.com/' + item.server + '/' + item.id + '_' + item.secret + '_t.jpg';
+    			   	var	photoLink = "http://www.flickr.com/photos/" + item.owner + "/" + item.id + "/";
+    			   	
+    			    if (i == 0){
+    			    	options.slides.splice(0,1,{ image : photoURL, thumb : thumbURL, title : item.title , url : photoLink });
+    			    }else{
+    			    	options.slides.push({ image : photoURL, thumb : thumbURL, title : item.title , url : photoLink });
+    			    }
+    			    
+    			 });
+    			
+    			//Shuffle slide order if needed		
+				if (options.random){
+					arr = options.slides;
+					for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);	//Fisher-Yates shuffle algorithm (jsfromhell.com/array/shuffle)
+				    options.slides = arr;
+				}
+    			
+    			/***Load initial set of images***/
+    			
+				if (options.slides.length > 1){
+					//Set previous image
+					currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
+					var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
+				
+				//Set current image
+				imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
+				$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
+			
+				if (options.slides.length > 1){
+					//Set next image
+					currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
+					imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
+					$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
+				}
+				
+				/***End load initial images***/
+    			 
+    		}//End AJAX Callback 
+    	 });
 
-		if (options.slides.length > 1){
-			//Set previous image
-			currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
-			var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
-			$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
-		}
-		
-		//Set current image
-		imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
-		$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
-		
-		if (options.slides.length > 1){
-			//Set next image
-			currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
-			imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
-			$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
-		}
-		/***End load initial images***/
 		
 		element.hide();					//Hide image to be faded in
 		$('#controls-wrapper').hide();	//Hide controls to be displayed
+		
+		//Account for loading in IE
+		$(document).ready(function() {
+			resizenow();
+		});
 		
 		$(window).load(function(){
 			
@@ -122,15 +189,15 @@
 			$('#controls-wrapper').show();		//Display controls
 			
 			//Display thumbnails
-			if (options.thumbnail_navigation){
+			if (options.thumbnail_navigation == 1){
 			
 				//Load previous thumbnail
 				currentSlide - 1 < 0  ? prevThumb = options.slides.length - 1 : prevThumb = currentSlide - 1;
-				$('#prevthumb').show().html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').show().html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 				
 				//Load next thumbnail
 				currentSlide == options.slides.length - 1 ? nextThumb = 0 : nextThumb = currentSlide + 1;
-				$('#nextthumb').show().html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').show().html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 		
 			}
 			
@@ -141,11 +208,13 @@
 			
 			
 			//Start slideshow if enabled
-			if (options.slideshow && options.slides.length > 1){
+			if (options.slideshow){
 			
 				if (options.slide_counter){	//Initiate slide counter if active
-					$('#slidecounter .slidenumber').html(currentSlide + 1);			//Pull initial slide number from options		
+					
+					$('#slidecounter .slidenumber').html(currentSlide + 1);		//Pull initial slide number from options		
 	    			$('#slidecounter .totalslides').html(options.slides.length);	//Pull total from length of array
+	    		
 	    		}
 	    		
 	    		slideshow_interval = setInterval(nextslide, options.slide_interval);	//Initiate slide interval
@@ -205,7 +274,7 @@
 				    	if(inAnimation) return false;		//Abort if currently animating
 				    	
 					    clearInterval(slideshow_interval);	//Stop slideshow
-					    nextslide();		//Go to next slide
+					    nextslide(element, options);		//Go to next slide
 					    if(!(isPaused)) slideshow_interval = setInterval(nextslide, options.slide_interval);	//If not paused, resume slideshow
 					    
 					    return false;
@@ -233,7 +302,7 @@
 				    	if(inAnimation) return false;		//Abort if currently animating
 				    	
 					    clearInterval(slideshow_interval);	//Stop slideshow
-					    prevslide();		//Go to previous slide
+					    prevslide(element, options);		//Go to previous slide
 					    if(!(isPaused)) slideshow_interval = setInterval(nextslide, options.slide_interval);	//If not paused, resume slideshow
 					    
 					    return false;
@@ -294,9 +363,13 @@
 			$(document.documentElement).keydown(function (event) {
 				
 				if ((event.keyCode == 37) || (event.keyCode == 40)) { //Left Arrow or Down Arrow
+					
 					if ($('#prevslide').attr('src')) $('#prevslide').attr("src", image_path + "back.png");		//If image, change back button to active
+				
 				} else if ((event.keyCode == 39) || (event.keyCode == 38)) { //Right Arrow or Up Arrow
+				
 					if ($('#nextslide').attr('src')) $('#nextslide').attr("src", image_path + "forward.png");	//If image, change next button to active
+				
 				}
 				
 			});
@@ -336,12 +409,20 @@
 					if(inAnimation) return false;		//Abort if currently animating
 					
 					if (isPaused){
+					
 						if ($(pauseplay).attr('src')) $(pauseplay).attr("src", image_path + "pause_dull.png");	//If image, swap to pause
-						isPaused = false;	//Resume slideshow
+						
+						//Resume slideshow
+						isPaused = false;
 			        	slideshow_interval = setInterval(nextslide, options.slide_interval);
+			        	  
 		        	}else{
+		        		
 		        		if ($(pauseplay).attr('src')) $(pauseplay).attr("src", image_path + "play_dull.png");	//If image, swap to play
-		        		isPaused = true;	//Mark as paused
+		        		
+		        		//Mark as paused
+		        		isPaused = true;
+		       		
 		       		}
 				    
 				    return false;
@@ -358,15 +439,19 @@
 				if(inAnimation) return false;		//Abort if currently animating
 		   			
 		   			if(!(isPaused) && options.navigation){
+		   				
 		   				if ($(pauseplay).attr('src')) $(pauseplay).attr("src", image_path + "pause.png"); 	//If image, swap to pause
 		   				clearInterval(slideshow_interval);
+		   				
 		   			}
 		   		
 		   	}, function() {
 					
 				if(!(isPaused) && options.navigation){
+				
 					if ($(pauseplay).attr('src')) $(pauseplay).attr("src", image_path + "pause_dull.png");	//If image, swap to active
 					slideshow_interval = setInterval(nextslide, options.slide_interval);
+				
 				}
 				
 		   	});
@@ -564,11 +649,11 @@
 			
 				//Load previous thumbnail
 				currentSlide - 1 < 0  ? prevThumb = slides.length - 1 : prevThumb = currentSlide - 1;
-				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 			
 				//Load next thumbnail
 				nextThumb = loadSlide;
-				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 				
 			}
 			
@@ -617,8 +702,10 @@
 	    			nextslide.animate({left : -$(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 					currentslide.animate({ left: $(window).width() }, options.transition_speed );
 	    			break;
+	    	
 	    	};
-  
+
+		    
 		}
 		
 		
@@ -651,6 +738,7 @@
 			
 			//Load next image
 			loadSlide = false;
+			
 			currentSlide - 1 < 0  ? loadSlide = slides.length - 1 : loadSlide = currentSlide - 1;	//Determine next slide
 			imageLink = (options.slides[loadSlide].url) ? "href='" + options.slides[loadSlide].url + "'" : "";	//If link exists, build it
 			$("<img/>").attr("src", options.slides[loadSlide].image).prependTo(element).wrap("<a " + imageLink + linkTarget + "></a>");	//Append new image
@@ -660,11 +748,11 @@
 			
 				//Load previous thumbnail
 				prevThumb = loadSlide;
-				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].image));
+				$('#prevthumb').html($("<img/>").attr("src", options.slides[prevThumb].thumb));
 				
 				//Load next thumbnail
 				currentSlide == slides.length - 1 ? nextThumb = 0 : nextThumb = currentSlide + 1;
-				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].image));
+				$('#nextthumb').html($("<img/>").attr("src", options.slides[nextThumb].thumb));
 			}
 			
 			currentslide.next().remove(); //Remove Old Image
@@ -712,6 +800,7 @@
 	    			nextslide.animate({left : $(window).width()}, 0 ).show().animate({ left:0 }, options.transition_speed, function(){ afterAnimation(); });
 					currentslide.animate({ left: -$(window).width() }, options.transition_speed );
 	    			break;	
+	    	
 	    	};
 		    	
 		}

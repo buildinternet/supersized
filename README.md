@@ -4,6 +4,10 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+3/15/11 - 3.1.3 Update (All editions)
+
+	*Added fix for images on IE failing to resize when loaded (update supersized.3.1.x.js)
+
 3/11/11 - Supersized 3.1.2 Updates (All editions)
 
 	*Added option for random slide order

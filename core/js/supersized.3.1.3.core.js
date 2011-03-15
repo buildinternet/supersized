@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Background jQuery Plugin
-	Version 3.1.2 Core
+	Version 3.1.3 Core
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -48,6 +48,11 @@
 		$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element);		//Set current image
 		
 		element.hide();		//Hide image to be faded in
+		
+		//Account for loading in IE
+		$(document).ready(function() {
+			resizenow();
+		});
 		
 		//Display image once page has loaded
 		$(window).load(function(){
