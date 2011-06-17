@@ -47,8 +47,11 @@
 			navigation              :   1,		//Slideshow controls on/off
 			thumbnail_navigation    :   0,		//Thumbnail navigation
 			slide_counter           :   1,		//Display slide numbers
-			slide_captions          :   1		//Slide caption (Pull from "title" in slides array)
+			slide_captions          :   1,		//Slide caption (Pull from "title" in slides array)
 			
+			//Callback functions
+			after_animation         :   null,	//Callback function to be exectued after the animation completes.  Called with the currentSlide number as an argument.
+			context                 :   this	//Scope in which to execute callback functions
     	};
 		
 		//Default elements
@@ -732,6 +735,11 @@
 			}
 			
 			resizenow();
+			
+			//If callback function is defined, execute the callback
+			if (options.after_animation){
+				options.after_animation.call(options.context, currentSlide);
+			}
 			
 		}
 		

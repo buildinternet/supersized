@@ -4,6 +4,10 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+HEAD
+
+	*Added after_animation callback
+
 3/15/11 - 3.1.3 Update (All editions)
 
 	*Added fix for images on IE failing to resize when loaded (update supersized.3.1.x.js)
