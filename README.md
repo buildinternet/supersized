@@ -4,6 +4,11 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+6/20/11 - 3.2.0 Early Release
+	
+	*Documentation, announcement post, and project page update to follow
+	*The Flickr edition is not updated from 3.1.3 yet - this is on it's way
+
 3/15/11 - 3.1.3 Update (All editions)
 
 	*Added fix for images on IE failing to resize when loaded (update supersized.3.1.x.js)
