@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : Core 3.2.0
+	Version : Core 3.2.1
 	
 	Site	: www.buildinternet.com/project/supersized
 	Author	: Sam Dunn
@@ -11,8 +11,10 @@
 */
 
 * { margin:0; padding:0; }
-body { background:#111; }
+body { background:#111; height:100%; }
 	img{ border:none; }
+	
+	#supersized-loader { position:absolute; top:50%; left:50%; z-index:0; width:60px; height:60px; margin:-30px 0 0 -30px; text-indent:-999em; background:url(../img/progress.gif) no-repeat center center;}
 	
 	#supersized { position:fixed; left:0; top:0; overflow:hidden; z-index:-999; height:100%; width:100%; }
 		#supersized img{ width:auto; height:auto; position:relative; outline:none; border:none; }

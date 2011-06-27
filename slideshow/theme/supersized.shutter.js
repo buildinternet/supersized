@@ -196,7 +196,7 @@
 	 	
 	 	/* Go To Slide
 		----------------------------*/
-	 	goTo : function(state){
+	 	goTo : function(){
 	 		if (api.options.progress_bar && !vars.is_paused){
 				$(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );
 				theme.progressBar();

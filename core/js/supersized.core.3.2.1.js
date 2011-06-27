@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : Core 3.2.0
+	Version : Core 3.2.1
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -15,7 +15,7 @@
 	/* Place Supersized Elements
 	----------------------------*/
 	$(document).ready(function() {
-		$('body').append('<div id="supersized"></div>');
+		$('body').append('<div id="supersized-loader"></div><div id="supersized"></div>');
 	});
     
     
@@ -86,6 +86,7 @@
 		base.launch = function(){
 		
 			base.$el.css('visibility','visible');
+			$('#supersized-loader').hide();		//Hide loading animation
 			
 			// Adjust image when browser is resized
 			$(window).resize(function(){
