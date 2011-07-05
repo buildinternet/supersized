@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.1
+	Version : 3.2.2
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -15,7 +15,7 @@
 	/* Place Supersized Elements
 	----------------------------*/
 	$(document).ready(function() {
-		$('body').append('<div id="supersized-loader"></div><div id="supersized"></div>');
+		$('body').append('<div id="supersized-loader"></div><ul id="supersized"></ul>');
 	});
     
     
@@ -48,6 +48,7 @@
         base._build = function(){
         	// Add in slide markers
         	var thisSlide = 0,
+        		slideSet = '',
 				markers = '',
 				markerContent,
 				thumbMarkers = '',
@@ -67,9 +68,11 @@
 						break;
 				}
 				
+				slideSet = slideSet+'<li class="slide-'+thisSlide+'"></li>';
+				
 				if(thisSlide == base.options.start_slide-1){
 					// Slide links
-					if (base.options.slide_links)markers = markers+'<li class="slide'+thisSlide+' current-slide"><a>'+markerContent+'</a></li>';
+					if (base.options.slide_links)markers = markers+'<li class="slide-link-'+thisSlide+' current-slide"><a>'+markerContent+'</a></li>';
 					// Slide Thumbnail Links
 					if (base.options.thumb_links){
 						base.options.slides[thisSlide].thumb ? thumbImage = base.options.slides[thisSlide].thumb : thumbImage = base.options.slides[thisSlide].image;
@@ -77,7 +80,7 @@
 					};
 				}else{
 					// Slide links
-					if (base.options.slide_links) markers = markers+'<li class="slide'+thisSlide+'"><a>'+markerContent+'</a></li>';
+					if (base.options.slide_links) markers = markers+'<li class="slide-link-'+thisSlide+'" ><a>'+markerContent+'</a></li>';
 					// Slide Thumbnail Links
 					if (base.options.thumb_links){
 						base.options.slides[thisSlide].thumb ? thumbImage = base.options.slides[thisSlide].thumb : thumbImage = base.options.slides[thisSlide].image;
@@ -86,11 +89,13 @@
 				}
 				thisSlide++;
 			}
+			
 			if (base.options.slide_links) $(vars.slide_list).html(markers);
 			if (base.options.thumb_links && vars.thumb_tray.length){
-				$(vars.thumb_tray).append('<ul id="'+vars.thumb_list.replace('#','')+'"></ul>');
-					$(vars.thumb_list).html(thumbMarkers);
+				$(vars.thumb_tray).append('<ul id="'+vars.thumb_list.replace('#','')+'">'+thumbMarkers+'</ul>');
 			}
+			
+			$(base.el).append(slideSet);
 			
 			// Add in thumbnails
 			if (base.options.thumbnail_navigation){
@@ -143,8 +148,9 @@
 				var imageLink = (base.options.slides[loadPrev].url) ? "href='" + base.options.slides[loadPrev].url + "'" : "";
 				
 				var imgPrev = $('<img src="'+base.options.slides[loadPrev].image+'"/>');
-				imgPrev.appendTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>');
-			
+				var slidePrev = base.el+' li:eq('+loadPrev+')';
+				imgPrev.appendTo(slidePrev).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading prevslide');
+				
 				imgPrev.load(function(){
 					$(this).data('origWidth', $(this).width()).data('origHeight', $(this).height());
 					base.resizeNow();	// Resize background image
@@ -157,7 +163,9 @@
 			// Set current image
 			imageLink = (api.getField('url')) ? "href='" + api.getField('url') + "'" : "";
 			var img = $('<img src="'+api.getField('image')+'"/>');
-			img.appendTo(base.el).wrap('<a class="image-loading activeslide" ' + imageLink + linkTarget + '></a>').css('visibility','hidden');
+			
+			var slideCurrent= base.el+' li:eq('+vars.current_slide+')';
+			img.appendTo(slideCurrent).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading activeslide');
 			
 			img.load(function(){
 				base._origDim($(this));
@@ -172,8 +180,9 @@
 				imageLink = (base.options.slides[loadNext].url) ? "href='" + base.options.slides[loadNext].url + "'" : "";
 				
 				var imgNext = $('<img src="'+base.options.slides[loadNext].image+'"/>');
-				imgNext.appendTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>');
-			
+				var slideNext = base.el+' li:eq('+loadNext+')';
+				imgNext.appendTo(slideNext).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading');
+				
 				imgNext.load(function(){
 					$(this).data('origWidth', $(this).width()).data('origHeight', $(this).height());
 					base.resizeNow();	// Resize background image
@@ -193,7 +202,7 @@
 		base.launch = function(){
 		
 			base.$el.css('visibility','visible');
-			$('#supersized-loader').hide();		//Hide loading animation
+			$('#supersized-loader').remove();		//Hide loading animation
 			
 			// Call theme function for before slide transition
 			if( typeof theme != 'undefined' && typeof theme.beforeAnimation == "function" ) theme.beforeAnimation('next');
@@ -243,9 +252,9 @@
 			
 			if (base.options.slide_links){
 				// Slide marker clicked
-				$('li', vars.slide_list).click(function(){
+				$(vars.slide_list+'> li').click(function(){
 				
-					index = $('li', vars.slide_list).index(this);
+					index = $(vars.slide_list+'> li').index(this);
 					targetSlide = index + 1;
 					
 					base.goTo(targetSlide);
@@ -256,9 +265,9 @@
 			
 			// Thumb marker clicked
 			if (base.options.thumb_links){
-				$('li', vars.thumb_list).click(function(){
+				$(vars.thumb_list+'> li').click(function(){
 				
-					index = $('li', vars.thumb_list).index(this);
+					index = $(vars.thumb_list+'> li').index(this);
 					targetSlide = index + 1;
 					
 					api.goTo(targetSlide);
@@ -412,7 +421,7 @@
 					
 					/*-----End Resize Functions-----*/
 					
-					if (thisSlide.parent().hasClass('image-loading')){
+					if (thisSlide.parents('li').hasClass('image-loading')){
 						$('.image-loading').removeClass('image-loading');
 					}
 					
@@ -446,7 +455,7 @@
         
         /* Next Slide
 		----------------------------*/
-		base.nextSlide = function(){
+		base.nextSlide = function(goSlide){
 			
 			if(vars.in_animation || !api.options.slideshow) return false;		// Abort if currently animating
 				else vars.in_animation = true;		// Otherwise set animation marker
@@ -455,14 +464,14 @@
 		    
 		    var slides = base.options.slides,					// Pull in slides array
 				liveslide = base.$el.find('.activeslide');		// Find active slide
-				liveslide.removeClass('activeslide');			// Remove active class
+				$('.prevslide').removeClass('prevslide');
+				liveslide.removeClass('activeslide').addClass('prevslide');	// Remove active class & update previous slide
 			
-		    if ( liveslide.length == 0 ) liveslide = base.$el.find('a:last');	// If end of set, note this is last slide
-		    var nextslide = liveslide.next().length ? liveslide.next() : base.$el.find('a:first'),
-		    	prevslide = nextslide.prev().length ? nextslide.prev() : base.$el.find('a:last');
+		   // if ( liveslide.length == 0 ) liveslide = base.$el.find('li:last');	// If end of set, note this is last slide
+		    var nextslide = liveslide.next().length ? liveslide.next() : base.$el.find('li:first'),
+		    	prevslide = base.$el.find('.prevslide');
 			
-			// Update previous slide
-			prevslide.addClass('prevslide');
+			if (goSlide) nextslide = $(base.el+' li:eq('+goSlide+')');
 			
 			// Get the slide number of new slide
 			vars.current_slide + 1 == base.options.slides.length ? vars.current_slide = 0 : vars.current_slide++;
@@ -474,20 +483,25 @@
 			/*-----Load Image-----*/
 			
 			loadSlide = false;
-			// If links should open in new window
-			var linkTarget = base.options.new_window ? ' target="_blank"' : '';
 			
 			vars.current_slide == base.options.slides.length - 1 ? loadSlide = 0 : loadSlide = vars.current_slide + 1;	// Determine next slide
-			imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
 			
-			var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>');
-			img.appendTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>').css('visibility','hidden');
-			
-			img.load(function(){
-				base._origDim($(this));
-				base.resizeNow();
-			});	// End Load
-			
+			var targetList = base.el+' li:eq('+loadSlide+')';
+			if (!$(targetList).html()){
+				// If links should open in new window
+				var linkTarget = base.options.new_window ? ' target="_blank"' : '';
+				
+				imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
+				var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>'); 
+				
+				img.appendTo(targetList).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading').css('visibility','hidden');
+				
+				img.load(function(){
+					base._origDim($(this));
+					base.resizeNow();
+				});	// End Load
+			};
+						
 			// Update thumbnails (if enabled)
 			if (base.options.thumbnail_navigation == 1){
 			
@@ -501,7 +515,7 @@
 				
 			}
 			
-			liveslide.prev().remove(); // Remove Old Image
+			
 			
 			/*-----End Load Image-----*/
 			
@@ -512,7 +526,7 @@
 			//Update slide markers
 			if (base.options.slide_links){
 				$('.current-slide').removeClass('current-slide');
-				$('li', vars.slide_list).eq(vars.current_slide).addClass('current-slide');
+				$(vars.slide_list +'> li' ).eq(vars.current_slide).addClass('current-slide');
 			}
 		    
 		    nextslide.css('visibility','hidden').addClass('activeslide');	// Update active slide
@@ -552,7 +566,7 @@
 		
 		/* Previous Slide
 		----------------------------*/
-		base.prevSlide = function(){
+		base.prevSlide = function(goSlide){
 		
 			if(vars.in_animation || !api.options.slideshow) return false;		// Abort if currently animating
 				else vars.in_animation = true;		// Otherwise set animation marker
@@ -561,15 +575,17 @@
 			
 			var slides = base.options.slides,					// Pull in slides array
 				liveslide = base.$el.find('.activeslide');		// Find active slide
-				liveslide.removeClass('activeslide');			// Remove active class
+				$('.prevslide').removeClass('prevslide');
+				liveslide.removeClass('activeslide').addClass('prevslide');		// Remove active class & update previous slide
+				
+		    var nextslide =  liveslide.prev().length ? liveslide.prev() : base.$el.find('li:last'),
+		    	prevslide =  base.$el.find('.prevslide');
+				
+			if (goSlide){
+				goSlide--;
+				nextslide = $(base.el+' li:eq('+goSlide+')');
+			}
 			
-		    if ( liveslide.length == 0 ) liveslide = base.$el.find('a:first');	// If end of set, note this is first slide
-		    var nextslide =  liveslide.prev().length ? liveslide.prev() : base.$el.find('a:last'),
-		    	prevslide =  nextslide.next().length ? nextslide.next() : base.$el.find('a:first');
-			
-			// Update previous slide
-			prevslide.addClass('prevslide');
-					
 			// Get current slide number
 			vars.current_slide == 0 ?  vars.current_slide = base.options.slides.length - 1 : vars.current_slide-- ;
 			
@@ -580,19 +596,22 @@
 			/*-----Load Image-----*/
 			
 			loadSlide = false;
-			// If links should open in new window
-			var linkTarget = base.options.new_window ? ' target="_blank"' : '';
 			
 			vars.current_slide - 1 < 0  ? loadSlide = base.options.slides.length - 1 : loadSlide = vars.current_slide - 1;	// Determine next slide
-			imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
-			
-			var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>');
-			img.prependTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>').css('visibility','hidden');
-			
-			img.load(function(){
-				base._origDim($(this));
-				base.resizeNow();
-			});	// End Load
+			var targetList = base.el+' li:eq('+loadSlide+')';
+			if (!$(targetList).html()){
+				// If links should open in new window
+				var linkTarget = base.options.new_window ? ' target="_blank"' : '';
+				imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
+				var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>'); 
+				
+				img.appendTo(targetList).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading').css('visibility','hidden');
+				
+				img.load(function(){
+					base._origDim($(this));
+					base.resizeNow();
+				});	// End Load
+			};
 			
 			// Update thumbnails (if enabled)
 			if (base.options.thumbnail_navigation == 1){
@@ -606,8 +625,6 @@
 				$(vars.next_thumb).html($("<img/>").attr("src", base.options.slides[nextThumb].image));
 			}
 			
-			liveslide.next().remove(); // Remove Old Image
-			
 			/*-----End Load Image-----*/
 			
 			
@@ -617,7 +634,7 @@
 			//Update slide markers
 			if (base.options.slide_links){
 				$('.current-slide').removeClass('current-slide');
-				$('li', vars.slide_list).eq(vars.current_slide).addClass('current-slide');
+				$(vars.slide_list +'> li' ).eq(vars.current_slide).addClass('current-slide');
 			}
 			
 		    nextslide.css('visibility','hidden').addClass('activeslide');	// Update active slide
@@ -690,11 +707,9 @@
     	/* Go to specific slide
 		----------------------------*/
     	base.goTo = function(targetSlide){
-    			
 			if (vars.in_animation || !api.options.slideshow) return false;		// Abort if currently animating
 			
 			var totalSlides = base.options.slides.length;
-			vars.update_images = true;
 			
 			// If target outside range
 			if(targetSlide < 0){
@@ -721,26 +736,28 @@
 				
 				// Adjust for new next slide
 				vars.current_slide = totalSlides-targetSlide-1;
-				base._placeSlide('next');
+				vars.update_images = 'next';
+				base._placeSlide(vars.update_images);
 				
 			//Otherwise it's before current position
 			}else if(totalSlides - targetSlide < vars.current_slide){
 				
 				// Adjust for new prev slide
 				vars.current_slide = totalSlides-targetSlide+1;
-			    base._placeSlide('prev');
+				vars.update_images = 'prev';
+			    base._placeSlide(vars.update_images);
 			    
 			}
 			
 			// set active markers
 			if (base.options.slide_links){
-				$('.current-slide', vars.slide_list).removeClass('current-slide');
-				$('li', vars.slide_list).eq((totalSlides-targetSlide)).addClass('current-slide');
+				$(vars.slide_list +'> .current-slide').removeClass('current-slide');
+				$(vars.slide_list +'> li').eq((totalSlides-targetSlide)).addClass('current-slide');
 			}
 			
 			if (base.options.thumb_links){
-				$('.current-thumb', vars.thumb_list).removeClass('current-thumb');
-				$('li', vars.thumb_list).eq((totalSlides-targetSlide)).addClass('current-thumb');
+				$(vars.thumb_list +'> .current-thumb').removeClass('current-thumb');
+				$(vars.thumb_list +'> li').eq((totalSlides-targetSlide)).addClass('current-thumb');
 			}
 			
 		};
@@ -753,45 +770,52 @@
 			// If links should open in new window
 			var linkTarget = base.options.new_window ? ' target="_blank"' : '';
 			
-			if (place == 'next'){
+			loadSlide = false;
 			
-				// Remove slide to be replaced
-				$('.activeslide').next().remove();
+			if (place == 'next'){
 				
-				loadSlide = false;
 				vars.current_slide == base.options.slides.length - 1 ? loadSlide = 0 : loadSlide = vars.current_slide + 1;	// Determine next slide
-				imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
 				
-				var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>');
-				img.appendTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>').css('visibility','hidden');
+				var targetList = base.el+' li:eq('+loadSlide+')';
 				
-				if (vars.update_images) base.nextSlide();		
+				if (!$(targetList).html()){
+					// If links should open in new window
+					var linkTarget = base.options.new_window ? ' target="_blank"' : '';
+					
+					imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
+					var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>'); 
+					
+					img.appendTo(targetList).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading').css('visibility','hidden');
+					
+					img.load(function(){
+						base._origDim($(this));
+						base.resizeNow();
+					});	// End Load
+				};
 				
-				img.load(function(){
-					base._origDim($(this));
-					base.resizeNow();
-				});	// End Load
+				base.nextSlide(loadSlide);
 				
 			}else if (place == 'prev'){
 			
-				// Remove slide to be replaced
-				$('.activeslide').prev().remove();
-				
-				loadSlide = false;
-			
 				vars.current_slide - 1 < 0  ? loadSlide = base.options.slides.length - 1 : loadSlide = vars.current_slide - 1;	// Determine next slide
-				imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
 				
-				var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>');
-				img.prependTo(base.el).wrap('<a class="image-loading" ' + imageLink + linkTarget + '></a>').css('visibility','hidden');
+				var targetList = base.el+' li:eq('+loadSlide+')';
 				
-				
-			    if (vars.update_images) base.prevSlide();
-				
-				img.load(function(){
-					base._origDim($(this));
-			    	base.resizeNow();
-				});	// End Load
+				if (!$(targetList).html()){
+					// If links should open in new window
+					var linkTarget = base.options.new_window ? ' target="_blank"' : '';
+					
+					imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
+					var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>'); 
+					
+					img.appendTo(targetList).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading').css('visibility','hidden');
+					
+					img.load(function(){
+						base._origDim($(this));
+						base.resizeNow();
+					});	// End Load
+				};
+				base.prevSlide(loadSlide+1);
 			}
 			
 		};
@@ -800,7 +824,7 @@
 		/* Get Original Dimensions
 		----------------------------*/
 		base._origDim = function(targetSlide){
-			targetSlide.data('origWidth', targetSlide.width()).data('origHeight', targetSlide.height()).css('visibility','visible');
+			targetSlide.data('origWidth', targetSlide.width()).data('origHeight', targetSlide.height());
 		};
 		
 		
@@ -813,10 +837,12 @@
 		    	base.$el.removeClass('speed').addClass('quality');
 			}
 			
+			// Update previous slide
 			if (vars.update_images){
+				vars.current_slide - 1 < 0  ? setPrev = base.options.slides.length - 1 : setPrev = vars.current_slide - 1;
 				vars.update_images = false;
-				base._placeSlide('next');
-				base._placeSlide('prev');
+				$('.prevslide').removeClass('prevslide');
+				$(base.el+' li:eq('+setPrev+')').addClass('prevslide');
 			}
 			
 			vars.in_animation = false;
@@ -826,7 +852,6 @@
 				vars.slideshow_interval = setInterval(base.nextSlide, base.options.slide_interval);
 				if (base.options.stop_loop && vars.current_slide == base.options.slides.length - 1 ) base.playToggle();
 			}
-			
 			
 			// Call theme function for after slide transition
 			if (typeof theme != 'undefined' && typeof theme.afterAnimation == "function" ) theme.afterAnimation();
@@ -849,8 +874,9 @@
 	$.supersized.vars = {
 	
 		// Elements							
-		thumb_tray			:	'#thumb-tray',	//Thumbnail tray
-		thumb_list			:	'#thumb-list',	//Thumbnail list
+		thumb_tray			:	'#thumb-tray',	// Thumbnail tray
+		thumb_list			:	'#thumb-list',	// Thumbnail list
+		slide_list          :   '#slide-list',	// Slide link list
 		
 		// Internal variables
 		current_slide			:	0,			// Current slide number
