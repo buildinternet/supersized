@@ -4,6 +4,14 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+7/8/11 - 3.2.3
+	*Fixed bug where certain transitions broke slideshow since the 3.2.2 update in Firefox and IE
+
+7/5/11	- 3.2.2
+	*Reworked Supersized slides to be insides an unordered list, rather than anchor tags
+	*Slides now load upon request and populate the respective list item. Corrects potential bandwidth problem when caching is turned off, if images keep getting reloaded.
+	*Only affects base slideshow files: supersized.3.2.x.js and supersized.css
+
 6/27/11 - 3.2.1
 
 	*Fixed Supersized loader not displaying initially (theme files unaffected)
