@@ -4,6 +4,12 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+7/13/11 - 3.2.4
+
+	*Slideshow files updated to 3.2.4 to address Firefox 5+ bug with slides not loading
+	*Flickr fix for 1.1.2 for Flickr API and window load event conflicts (thanks to dbertram)
+	*Update to Shutter CSS file to fix IE7 issue where progress bar wasn't left aligned
+
 7/8/11 - 3.2.3
 
 	*Fixed bug where certain transitions broke slideshow since the 3.2.2 update in Firefox and IE

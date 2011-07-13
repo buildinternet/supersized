@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.3
+	Version : 3.2.4
 	Theme 	: Shutter 1.1
 	
 	Site	: www.buildinternet.com/project/supersized

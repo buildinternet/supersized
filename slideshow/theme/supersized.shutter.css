@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.3
+	Version : 3.2.4
 	Site	: www.buildinternet.com/project/supersized
 	
 	Theme 	: Shutter 1.1
@@ -40,7 +40,7 @@
 	
 	/* Progress Bar
 	----------------------------*/					
-	#progress-back{ z-index:5; position:fixed; bottom:42px; height:8px; width:100%; background:url('../img/progress-back.png') repeat-x; }
+	#progress-back{ z-index:5; position:fixed; bottom:42px; left:0; height:8px; width:100%; background:url('../img/progress-back.png') repeat-x; }
 		#progress-bar{ position:relative; height:8px; width:100%; background:url('../img/progress-bar.png') repeat-x; }
 	
 	
