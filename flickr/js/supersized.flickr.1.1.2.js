@@ -114,7 +114,7 @@
 	    		break;
 	    		
 	    }
-    	
+		var flickrLoaded = false;
 		$.ajax({ //request to Flickr
 			type: 'GET',  
   			url: flickrURL,  
@@ -169,7 +169,7 @@
 				}
 				
 				/***End load initial images***/
-    			 
+				flickrLoaded = true;
     		}//End AJAX Callback 
     	 });
 
@@ -182,7 +182,19 @@
 			resizenow();
 		});
 		
-		$(window).load(function(){
+		$(window).load(function() {
+			ready();
+		});
+		
+		var ready = function(){
+			if(flickrLoaded) {
+				loadFunc();
+			} else {
+				setTimeout(ready, 100);
+			}
+		};
+		
+		var loadFunc = function(){
 			
 			$('#supersized-loader').hide();		//Hide loading animation
 			element.fadeIn('fast');				//Fade in background
