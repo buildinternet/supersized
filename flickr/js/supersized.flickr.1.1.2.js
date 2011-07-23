@@ -367,7 +367,7 @@
 				
 			}	//End slideshow options
 			
-		});		//End window load
+		};		//End window load
 				
 		//Keyboard Navigation
 		if (options.keyboard_nav){
