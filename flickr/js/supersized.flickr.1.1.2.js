@@ -50,10 +50,11 @@
 			slide_captions          :   1,		//Slide caption (Pull from "title" in slides array)
 			
 			//Flickr
-			source					:	2,		//1-Set, 2-User, 3-Group
+			source					:	2,		//1-Set, 2-User, 3-Group, 4-Tags
 			set                     :   '###', 	//Flickr set ID (found in URL)
 			user					:	'###',	//Flickr user ID (http://idgettr.com/)
 			group					:	'###', 	//Flickr group ID (http://idgettr.com/)
+			tags			: '###,###',    //Comma separated tags
 			total_slides			:	100,	//How many pictures to pull (Between 1-500)
 			image_size              :   'z',	//Flickr image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
 			slides 					: 	[{}],	//Initiate slides array
@@ -111,6 +112,9 @@
 	    		break;
 	    	case 3:		//From a Group
 	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		break;
+		case 4:		//From tags
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&tags=' + options.tags + '&per_page=' + options.total_slides + '&jsoncallback=?';
 	    		break;
 	    		
 	    }
@@ -367,7 +371,7 @@
 				
 			}	//End slideshow options
 			
-		});		//End window load
+		};		//End window load
 				
 		//Keyboard Navigation
 		if (options.keyboard_nav){
