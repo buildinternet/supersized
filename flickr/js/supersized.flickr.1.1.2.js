@@ -58,6 +58,8 @@
 			total_slides			:	100,	//How many pictures to pull (Between 1-500)
 			image_size              :   'z',	//Flickr image Size - t,s,m,z,b  (Details: http://www.flickr.com/services/api/misc.urls.html)
 			slides 					: 	[{}],	//Initiate slides array
+			sort_by			:    1,		//1-Date Posted, 2-Date Taken, 3-Interestingness
+			sort_direction		:    0,		//0-descending, 1-ascending
     	
     		/**
     		FLICKR API KEY
@@ -101,23 +103,53 @@
 			element.addClass('quality');	//Higher image quality
 		}    	
     	
+
+	var sort_order = '';
+	switch(options.sort_by){
+		case 1:
+			sort_order = 'date-posted';
+			break;
+		case 2:
+			sort_order = 'date-taken';
+			break;
+		case 3:
+			sort_order = 'interestingness';
+			break;
+		default:
+			sort_order = 'date-posted';
+			break;
+	}
+
+	switch(options.sort_direction){
+		case 0:
+			sort_order = sort_order + '-desc';
+			break;
+		case 1:
+			sort_order = sort_order + '-asc';
+			break;
+		default:
+			sort_order = sort_order + '-desc';
+			break;
+	}
+
     	//Determine where to pull images from
     	switch(options.source){
 		    		
 	    	case 1:		//From a Set
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&format=json&jsoncallback=?';
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&format=json&jsoncallback=?';
 	    		break;
 	    	case 2:		//From a User
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
 	    	case 3:		//From a Group
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
 		case 4:		//From tags
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&tags=' + options.tags + '&per_page=' + options.total_slides + '&jsoncallback=?';
+	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&tags=' + options.tags + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
-	    		
 	    }
+
+
 		var flickrLoaded = false;
 		$.ajax({ //request to Flickr
 			type: 'GET',  
