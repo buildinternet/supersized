@@ -4,6 +4,11 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+9/23/11 - 3.2.5
+
+	*Fixed resize error when only two slides were present
+	*Updated comments for slide_link to reflect actual option ("number" to "num")
+	
 7/13/11 - 3.2.4
 
 	*Slideshow files updated to 3.2.4 to address Firefox 5+ bug with slides not loading
