@@ -4,6 +4,11 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+11/28/11 - 3.2.6
+
+	*Fixed issue where previous slide was not displaying after goTo()
+	*Update supersized.3.2.6.js
+
 9/23/11 - 3.2.5
 
 	*Fixed resize error when only two slides were present
