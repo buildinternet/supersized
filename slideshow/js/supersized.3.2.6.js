@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.5
+	Version : 3.2.6
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -482,9 +482,9 @@
 			/*-----Load Image-----*/
 			
 			loadSlide = false;
-			
+
 			vars.current_slide == base.options.slides.length - 1 ? loadSlide = 0 : loadSlide = vars.current_slide + 1;	// Determine next slide
-			
+
 			var targetList = base.el+' li:eq('+loadSlide+')';
 			if (!$(targetList).html()){
 				
@@ -590,9 +590,8 @@
 			
 			/*-----Load Image-----*/
 			
-			loadSlide = false;
+			loadSlide = vars.current_slide;
 			
-			vars.current_slide - 1 < 0  ? loadSlide = base.options.slides.length - 1 : loadSlide = vars.current_slide - 1;	// Determine next slide
 			var targetList = base.el+' li:eq('+loadSlide+')';
 			if (!$(targetList).html()){
 				// If links should open in new window
