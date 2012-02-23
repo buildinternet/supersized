@@ -1,10 +1,10 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.6
+	Version : 3.2.7
 	Site	: www.buildinternet.com/project/supersized
 	
-	Theme 	: Shutter 1.1
+	Theme 	: Shutter 1.2
 	Author	: Sam Dunn
 	Company : One Mighty Roar (www.onemightyroar.com)
 	License : MIT License / GPL License
@@ -68,6 +68,7 @@
 		
 		ul#thumb-list{ display:inline-block; list-style:none; position:relative; left:0px; padding:0 0px; }
 			ul#thumb-list li{ background:#111; list-style:none; display:inline; width:150px; height:108px; overflow:hidden; float:left; margin:0; }
-				ul#thumb-list li img { width:200px; height:auto; opacity:0.5; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)"; filter:alpha(opacity=60); }
+				ul#thumb-list li img { width:200px; height:auto; opacity:0.5; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)"; filter:alpha(opacity=60); -webkit-transition: all 100ms ease-in-out; -moz-transition: all 100ms ease-in-out; -o-transition: all 100ms ease-in-out; -ms-transition: all 100ms ease-in-out; transition: all 100ms ease-in-out; }
 				ul#thumb-list li.current-thumb img, ul#thumb-list li:hover img{ opacity:1; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; filter:alpha(opacity=100); }
 				ul#thumb-list li:hover{ cursor:pointer; }
+				

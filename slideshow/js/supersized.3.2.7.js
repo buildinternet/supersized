@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.6
+	Version : 3.2.7
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -533,8 +533,7 @@
 		    
 	    	switch(base.options.transition){
 	    		case 0: case 'none':	// No transition
-	    		    nextslide.css('visibility','visible');
-	    		    vars.in_animation = false;
+	    		    nextslide.css('visibility','visible'); vars.in_animation = false; base.afterAnimation();
 	    		    break;
 	    		case 1: case 'fade':	// Fade
 	    		    nextslide.animate({opacity : 0},0).css('visibility','visible').animate({opacity : 1, avoidTransforms : false}, base.options.transition_speed, function(){ base.afterAnimation(); });
@@ -611,7 +610,8 @@
 			if (base.options.thumbnail_navigation == 1){
 			
 				// Load previous thumbnail
-				prevThumb = loadSlide;
+				//prevThumb = loadSlide;
+				loadSlide == 0 ? prevThumb = base.options.slides.length - 1 : prevThumb = loadSlide - 1;
 				$(vars.prev_thumb).html($("<img/>").attr("src", base.options.slides[prevThumb].image));
 				
 				// Load next thumbnail
