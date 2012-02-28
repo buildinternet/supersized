@@ -89,3 +89,8 @@ Documentation can be found on the official project page: [http://www.buildintern
 	**If you are upgrading from a previous version, the structure has changed - I will post how to go about this when I do the corresponding post.
 
 2/11/11 - Supersized Core files updated with reduced code, cleaner file structure, and dynamic image proportions.
+
+## Contact
+
+- http://twitter.com/vivalasam
+- sam@onemightyroar.com
