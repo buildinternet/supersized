@@ -174,6 +174,7 @@
 				base.resizeNow();	// Resize background image
 				base.launch();
 				if( typeof theme != 'undefined' && typeof theme._init == "function" ) theme._init();	// Load Theme
+				if (typeof base.options.on_new_slide == "function") base.options.on_new_slide();	// Fire the callback for initial load
 			});
 			
 			if (base.options.slides.length > 1){
@@ -559,6 +560,10 @@
 					liveslide.animate({ left: base.$el.width(), avoidTransforms : false }, base.options.transition_speed );
 	    			break;
 	    	}
+
+			// Runs the on_new_slide callback if specified
+			if (typeof base.options.on_new_slide == "function") base.options.on_new_slide();
+
 		    return false;	
 		};
 		
@@ -661,6 +666,10 @@
 					liveslide.animate({left : 0}, 0 ).animate({ left: -base.$el.width(), avoidTransforms : false }, base.options.transition_speed );
 	    			break;
 	    	}
+
+			// Runs the on_new_slide callback if specified
+			if (typeof base.options.on_new_slide == "function") base.options.on_new_slide();
+
 		    return false;	
 		};
 		
@@ -902,6 +911,7 @@
 		keyboard_nav            :   1,			// Keyboard navigation on/off
 		performance				:	1,			// 0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed //  (Only works for Firefox/IE, not Webkit)
 		image_protect			:	1,			// Disables image dragging and right click with Javascript
+		on_new_slide			:	0,			// Callback for when a new image is loaded
 												   
 		// Size & Position
 		fit_always				:	0,			// Image will never exceed browser width or height (Ignores min. dimensions)
