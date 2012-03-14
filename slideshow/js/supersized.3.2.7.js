@@ -58,7 +58,7 @@
 				//Determine slide link content
 				switch(base.options.slide_links){
 					case 'num':
-						markerContent = thisSlide;
+						markerContent = thisSlide + 1;
 						break;
 					case 'name':
 						markerContent = base.options.slides[thisSlide].title;
