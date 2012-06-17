@@ -560,7 +560,7 @@
 						if ((browserheight/browserwidth) > ratio){
 							options.fit_landscape && ratio <= 1 ? resizeWidth() : resizeHeight();	//If landscapes are set to fit
 						} else {
-							options.fit_portrait && ratio > 1 ? resizeHeight() : resizeWidth();		//If portraits are set to fit
+							options.fit_portrait && ratio >= 1 ? resizeHeight() : resizeWidth();		//If portraits are set to fit
 						}
 						
 					}
