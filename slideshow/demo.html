@@ -4,7 +4,7 @@
 
 	<!--
 		Supersized - Fullscreen Slideshow jQuery Plugin
-		Version : 3.2.7
+		Version : 3.2.8
 		Site	: www.buildinternet.com/project/supersized
 		
 		Author	: Sam Dunn
@@ -23,11 +23,15 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 		<script type="text/javascript" src="js/jquery.easing.min.js"></script>
 		
-		<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
+		<script type="text/javascript" src="js/supersized.3.2.8.min.js"></script>
 		<script type="text/javascript" src="theme/supersized.shutter.min.js"></script>
 		
 		<script type="text/javascript">
 			
+			function callback() {
+				$('.callback-demo').html('The current image URL slide is:<br /><strong>' + api.getField('image') + '</strong>');
+			}
+
 			jQuery(function($){
 				
 				$.supersized({
@@ -46,7 +50,8 @@
 					keyboard_nav            :   1,			// Keyboard navigation on/off
 					performance				:	1,			// 0-Normal, 1-Hybrid speed/quality, 2-Optimizes image quality, 3-Optimizes transition speed // (Only works for Firefox/IE, not Webkit)
 					image_protect			:	1,			// Disables image dragging and right click with Javascript
-															   
+					on_new_slide			:	callback,	// Calls a function when a new slide/image is loaded
+
 					// Size & Position						   
 					min_width		        :   0,			// Min width allowed (in pixels)
 					min_height		        :   0,			// Min height allowed (in pixels)
@@ -96,6 +101,7 @@
 	<ul id="demo-block">
 		<li><a href="http://buildinternet.com/project/supersized/" target="_blank"><img src="img/supersized-logo.png"/></a></li>
 		<li>Photographers: <a href="http://cargocollective.com/mariakazvan" target="_blank">Maria Kazvan</a>, <a href="http://colindub.com" target="_blank">Colin Wojno</a>, &amp; <a href="http://brookeshaden.com/" target="_blank">Brooke Shaden</a></li>
+		<li class="callback-demo"></li>
 	</ul>
 	
 	<!--End of styles-->
