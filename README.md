@@ -1,5 +1,12 @@
 # Supersized jQuery Plugin
 
+In order to test the videos a local webserver is required.
+I've provided the a shortcut for the webrick server. 
+RUN in the terminal:
+ruby start_webrick.rb
+will start the server and output a unique localhost:PORT_NUMBER to access the slideshow directory from.
+
+
 Documentation can be found on the official project page: [http://www.buildinternet.com/project/supersized/](http://www.buildinternet.com/project/supersized/)
 
 *** Changelog ***
