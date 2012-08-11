@@ -1,0 +1,98 @@
+/*
+
+	Supersized jQuery Plugin LESS
+	Version 4.0
+	
+	@author: 	Sam Dunn
+	@company: One Mighty Roar
+	@blog:		Build Internet
+	@date:		2012
+	
+--------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #111;
+  height: 100%;
+}
+img {
+  border: none;
+  outline: none;
+  display: block;
+}
+#supersized-loader {
+  background: url(../img/progress.gif) no-repeat center center;
+  height: 60px;
+  left: 50%;
+  margin: -30px 0 0 -30px;
+  position: absolute;
+  text-indent: -999em;
+  top: 50%;
+  width: 60px;
+  z-index: 0;
+}
+.supersized {
+  display: block;
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: -999;
+}
+.supersized a {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.supersized img {
+  border: none;
+  display: none;
+  height: auto;
+  outline: none;
+  position: relative;
+  width: auto;
+}
+.supersized.ss-speed img {
+  image-rendering: -moz-crisp-edges;
+  ms-interpolation-mode: nearest-neighbor;
+}
+.supersized.ss-quality img {
+  image-rendering: optimizeQuality;
+  ms-interpolation-mode: bicubic;
+}
+.supersized li {
+  background: #111;
+  display: block;
+  height: 100%;
+  left: 0;
+  list-style: none;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: -30;
+}
+.supersized li.prevslide {
+  z-index: -20;
+}
+.supersized li.prevslide img {
+  display: inline-block;
+}
+.supersized li.activeslide {
+  z-index: -10;
+}
+.supersized li.activeslide img {
+  display: inline-block;
+}
+.supersized li.image-loading {
+  background: #111111 url(../img/progress.gif) no-repeat center center;
+  height: 100%;
+  width: 100%;
+}
+.supersized li.image-loading img {
+  visibility: hidden;
+}
