@@ -17,7 +17,7 @@
 	function Supersized(element, options) {
 	
 		// Define Element
-		var base = this;
+		window.base = this;
 		base.$el = $(element);
 		base.el = element;
 		
@@ -26,103 +26,187 @@
 		
 		// Add Supersized to element
 		base.$el.append('<ul class="supersized"></ul>');
-		base.$ss = base.$el.find('.supersized');
+		base.$ss = base.$el.find('.supersized'); // Set Supersized reference
 				
-		// Variables
-		base.currentSlide = base.settings.start_slide - 1;
+		// General Variables
+		this.currentSlide = base.settings.start_slide - 1;
+		
 		
 		// Build Slideshow
-		base._buildSlide = 0;
-		base._slideSet = '';
+		// --------------------------------------------------
+		this._slideSet = '',
+		this._slideStack = [];
+		// Temp slide meta
+		var slideMeta = {
+			isLoaded: false,
+			origHeight: 0,
+			origWidth:	0,
+			ratio:	1
+		};
 		
-		while(base._buildSlide <= base.settings.slides.length-1){
-			base._slideSet += '<li class="slide-'+base._buildSlide+'"></li>';
-			base._buildSlide++;
-		}
-		base.$ss.html(base._slideSet);
+		$.each(base.settings.slides, function(i){
+ 			base._slideStack.push(slideMeta); // Push placeholder to array
+			base._slideSet += '<li class="slide-'+ i +'"></li>';
+		});
 		
-		
-		/*// Load Slide
-		imageLink = (api.getField('url')) ? "href='" + api.getField('url') + "'" : "";
-		var img = $('<img src="'+api.getField('image')+'"/>');
-			
-			var slideCurrent= base.el+' li:eq('+vars.current_slide+')';
-			img.appendTo(slideCurrent).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading activeslide');
-			
-			img.load(function(){
-				base._origDim($(this));
-				base.resizeNow();	// Resize background image
-				base.launch();
-				if( typeof theme != 'undefined' && typeof theme._init == "function" ) theme._init();	// Load Theme
-			});
-		*/
-		
-		
-		
-		// Place Navigation Links
-		base._buildMarkers = 0,
-		base._slideSet = '',
-		base._markers = '',
-		base._markerContent
-		base._thumbMarkers = '',
-		base._thumbImage;
-		
-		
-		if(base._buildSlide == base.settings.start_slide - 1){
+		base.$ss.html(base._slideSet); // Add HTML for list items
 				
-					/*// Slide links
-					if (base.settings.slide_links)base._markers = base._markers+'<li class="slide-link-'+buildSlide+' current-slide"><a>'+base._markerContent+'</a></li>';
-					// Slide Thumbnail Links
-					if (base.settings.thumb_links){
-						base.settings.slides[base._buildSlide].thumb ? base._thumbImage = base.settings.slides[base._buildSlide].thumb : base._thumbImage = base.settings.slides[base._buildSlide].image;
-						base._thumbMarkers = base._thumbMarkers+'<li class="thumb'+base._buildSlide+' current-thumb"><img src="'+base._thumbImage+'"/></li>';
-					};
-				}else{
-					// Slide links
-					if (base.settings.slide_links) base._markers = base._markers+'<li class="slide-link-'+buildSlide+'" ><a>'+base._markerContent+'</a></li>';
-					// Slide Thumbnail Links
-					if (base.settings.thumb_links){
-						base.settings.slides[base._buildSlide].thumb ? base._thumbImage = base.settings.slides[buildSlide].thumb : thumbImage = base.settings.slides[buildSlide].image;
-						base._thumbMarkers = base._thumbMarkers+'<li class="thumb'+base._buildSlide+'"><img src="'+base._thumbImage+'"/></li>';
-					};
-				}
-				base._buildSlide++;*/
-		}
+		
+		// Adjust on Resize
+		$(window).on('resize', function(){
+			base.resizeImages();
+		});
+		
+				
+		// Load Initial Slides
+		// --------------------------------------------------
+		base.loadSlide(2);
 		
 		
 		
 	};
 
 
+
+	
+	
+/* -------------------- Supersized Prototype -------------------- */
+	
+	Supersized.prototype = {
+		
+		// PUBLIC METHODS
+		// --------------------------------------------------
+		
+		// Load new slide
+		loadSlide:function(slide){
+			
+			var targetSlide = base.$ss.find('li').eq(slide).addClass('ss-loading');
+			var slideToLoad = 	$('<img/>').attr('src', this.settings.slides[slide].image);
+			
+			slideToLoad.one('load', function(){
+			
+				targetSlide.html(slideToLoad.hide()).removeClass('ss-loading');
+				
+				// Add to slide stack
+				base._slideStack[slide].isLoaded = true;
+				base._slideStack[slide].origHeight = slideToLoad.height();
+				base._slideStack[slide].origWidth = slideToLoad.width();
+				base._slideStack[slide].ratio = (slideToLoad.height() / slideToLoad.width()).toFixed(2);
+				
+				base.resizeImages();
+				
+				slideToLoad.fadeIn();
+				
+			}).each(function() { // When load isn't fired (cache/compatibility)
+				if(this.complete) $(this).trigger('load');
+			}); 
+			
+		},
+		
+		// Resize slides
+		resizeImages:function(targetSlide){
+			
+			// Gather slideshow size
+			this.ssWidth = base.$el.width(),
+			this.ssHeight = base.$el.height(),
+			this.focusResize,
+			this.ratio,
+			this.offset;
+			
+			//alert(base.$el.height());
+			
+			$('img', this.$ss).each(function(){
+				if (base._slideStack[$(this).index()].isLoaded){ // make sure image loaded
+					base.ratio = base._slideStack[$(this).index()].ratio; // image ratio
+					
+					base.focusResize = $(this); // image to be resized			
+					
+					base._resizeWidth();
+					
+					// Horizontally Center
+					if (base.settings.horizontal_center) base.focusResize.css('left', (base.ssWidth - base.focusResize.width())/2);
+					
+					// Vertically Center
+					if (base.settings.vertical_center) base.focusResize.css('top', (base.ssHeight - base.focusResize.height())/2);
+								
+				}
+			});
+			
+		},
+		
+		
+		// PRIVATE METHODS
+		// --------------------------------------------------
+		
+		_resizeWidth:function(min){
+		 
+			if (min){	// If min height needs to be considered
+				if(this.focusResize.width() < this.ssWidth || this.focusResize.width() < this.settings.min_width ){
+			  	if (this.focusResize.width() * this.ratio >= this.settings.min_height){
+			  		this.focusResize.width(this.settings.min_width);
+			    		this.focusResize.height(this.focusResize.width() * this.ratio);
+			    	}else{
+			    		base.resizeHeight();
+			    	}
+			    }
+			}else{
+			  if (this.settings.min_height >= this.ssHeight && !this.settings.fit_landscape){	// If min height needs to be considered
+			  	if (this.ssWidth * this.ratio >= this.settings.min_height || (this.ssWidth * this.ratio >= this.settings.min_height && this.ratio <= 1)){	// If resizing would push below min height or image is a landscape
+			  		this.focusResize.width(this.ssWidth);
+			  		this.focusResize.height(this.ssWidth * this.ratio);
+			  	} else if (this.ratio > 1){		// Else the image is portrait
+			  		this.focusResize.height(this.settings.min_height);
+			  		this.focusResize.width(this.focusResize.height() / this.ratio);
+			  	} else if (this.focusResize.width() < this.ssWidth) {
+			  		this.focusResize.width(this.ssWidth);
+			    	this.focusResize.height(this.focusResize.width() * this.ratio);
+			  	}
+			  }else{	// Otherwise, resize as normal
+			  	this.focusResize.width(this.ssWidth);
+			  	this.focusResize.height(this.ssWidth * this.ratio);
+			  }
+			}
+			
+		},
+		
+		_resizeHeight:function(min){
+			if (min){	// If minimum height needs to be considered
+				if(this.focusResize.height() < this.ssHeight){
+			  	if (this.focusResize.height() / this.ratio >= this.settings.min_width){
+			  		this.focusResize.height(this.settings.min_height);
+			  		this.focusResize.width(this.focusResize.height() / this.ratio);
+			  	}else{
+			  		base.resizeWidth(true);
+			  	}
+			  }
+			}else{	// Otherwise, resized as normal
+			  if (this.settings.min_width >= this.ssWidth){	// If minimum width needs to be considered
+			  	if (this.ssHeight / ratio >= this.settings.min_width || this.ratio > 1){	// If resizing would push below minimum width or image is a portrait
+			  		this.focusResize.height(this.ssHeight);
+			  		this.focusResize.width(this.ssHeight / this.ratio);
+			  	} else if (this.ratio <= 1){		// Else the image is landscape
+			  		this.focusResize.width(this.settings.min_width);
+			    		this.focusResize.height(this.focusResize.width() * this.ratio);
+			  	}
+			  }else{	// Otherwise, resize as normal
+			  	this.focusResize.height(this.ssHeight);
+			  	this.focusResize.width(this.ssHeight / this.ratio);
+			  }
+			}
+		}
+		
+		
+	};
+	
+/* -------------------- End Supersized Prototype -------------------- */
+
+	
 	$.fn.supersized = function(options) {    	
 		return this.each(function(){
 			var supersized = new Supersized($(this), options);
 			$(this).data("supersized", supersized);
 		});
 	};
-	
-	
-	// Supersized Prototype
-	// --------------------------------------------------
-	Supersized.prototype = {
-		
-		// PUBLIC METHODS
-		// ==============
-		nameEl:function(){
-			console.log(this.settings.slideshow);
-		},
-		
-		
-		
-		// PRIVATE METHODS
-		// ===============
-		_resizeEvent:function(){
-			console.log(this);
-		}
-		
-		
-	};
-	
 	
 	
 	// Default Options
@@ -150,8 +234,8 @@
 		fit_portrait      :   1,			// Portrait images will not exceed browser height  			   
 		min_width		      :   0,			// Min width allowed (in pixels)
 		min_height		    :   0,			// Min height allowed (in pixels)
-		horizontal_center :   1,			// Horizontally center background
-		vertical_center   :   1,			// Vertically center background
+		horizontal_center :   0,			// Horizontally center background
+		vertical_center   :   0,			// Vertically center background
 												   
 		// Components							
 		slide_links				:	1,			// Individual links for each slide (Options: false, 'num', 'name', 'blank')
