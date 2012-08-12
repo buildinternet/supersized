@@ -57,6 +57,34 @@ body {
   font: bold 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 50px;
 }
+#ss-next,
+#ss-prev {
+  position: absolute;
+  top: 50%;
+  margin-top: -20px;
+  padding: 10px 15px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-transition: all 200ms ease-in-out;
+  -moz-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+}
+#ss-next img,
+#ss-prev img {
+  height: 40px;
+  width: auto;
+}
+#ss-next:hover,
+#ss-prev:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+#ss-next {
+  right: -5px;
+}
+#ss-prev {
+  left: -5px;
+}
 #ss-progress-bar {
   position: fixed;
   top: 0;
