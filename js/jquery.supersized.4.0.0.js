@@ -25,8 +25,7 @@
 		base.settings = $.extend({}, $.fn.supersized.defaults, options);
 		
 		// Add Supersized to element
-		base.$el.append('<ul class="supersized"></ul>');
-		base.$ss = base.$el.find('.supersized'); // Set Supersized reference
+		base.$el.addClass('supersized');
 				
 		// General Variables
 		this.currentSlide = base.settings.start_slide - 1;
@@ -49,8 +48,10 @@
 			base._slideSet += '<li class="slide-'+ i +'"></li>';
 		});
 		
-		base.$ss.html(base._slideSet); // Add HTML for list items
+		base.$el.html(base._slideSet); // Add HTML for list items
 				
+		
+		// Events
 		
 		// Adjust on Resize
 		$(window).on('resize', function(){
@@ -77,10 +78,10 @@
 		// PUBLIC METHODS
 		// --------------------------------------------------
 		
-		// Load new slide
+		// LOAD NEW SLIDE
 		loadSlide:function(slide){
 			
-			var targetSlide = base.$ss.find('li').eq(slide).addClass('ss-loading');
+			var targetSlide = base.$el.find('li').eq(slide).addClass('ss-loading');
 			var slideToLoad = 	$('<img/>').attr('src', this.settings.slides[slide].image);
 			
 			slideToLoad.one('load', function(){
@@ -103,7 +104,7 @@
 			
 		},
 		
-		// Resize slides
+		// RESIZE SLIDES
 		resizeImages:function(targetSlide){
 			
 			// Gather slideshow size
@@ -113,21 +114,71 @@
 			this.ratio,
 			this.offset;
 			
-			//alert(base.$el.height());
-			
-			$('img', this.$ss).each(function(){
+			$('img', base.$el).each(function(){
 				if (base._slideStack[$(this).index()].isLoaded){ // make sure image loaded
 					base.ratio = base._slideStack[$(this).index()].ratio; // image ratio
 					
 					base.focusResize = $(this); // image to be resized			
 					
-					base._resizeWidth();
+					
+					/* ---------- Determine Resize ---------- */
+					if (base.settings.fit_always){	// Fit always is enabled
+						if ((base.ssHeight/base.ssWidth) > base.ratio){
+							base._resizeWidth();
+						} else {
+							base._resizeHeight();
+						}
+					} else if (base.settings.fit_height_only){	// Fit height only is enabled
+					 		base._resizeHeight();
+					} else {	// Normal Resize
+						if ((base.ssHeight <= base.settings.min_height) && (base.ssWidth <= base.settings.min_width)){	// If window smaller than minimum width and height
+						
+							if ((base.ssHeight/base.ssWidth) > base.ratio){
+								base.settings.fit_landscape && base.ratio < 1 ? base._resizeWidth(true) : base._resizeHeight(true);	// If landscapes are set to fit
+							} else {
+								base.settings.fit_portrait && base.ratio >= 1 ? base._resizeHeight(true) : base._resizeWidth(true);		// If portraits are set to fit
+							}
+						
+						} else if (base.ssWidth <= base.settings.min_width){		// If window only smaller than minimum width
+						
+							if ((base.ssHeight/base.ssWidth) > base.ratio){
+								base.settings.fit_landscape && base.ratio < 1 ? base._resizeWidth(true) : base._resizeHeight();	// If landscapes are set to fit
+							} else {
+								base.settings.fit_portrait && base.ratio >= 1 ? base._resizeHeight() : base._resizeWidth(true);		// If portraits are set to fit
+							}
+							
+						} else if (base.ssHeight <= base.settings.min_height){	// If window only smaller than minimum height
+						
+							if ((base.ssHeight/base.ssWidth) > base.ratio){
+								base.settings.fit_landscape && base.ratio < 1 ? base._resizeWidth() : base._resizeHeight(true);	// If landscapes are set to fit
+							} else {
+								base.settings.fit_portrait && base.ratio >= 1 ? base._resizeHeight(true) : base._resizeWidth();		// If portraits are set to fit
+							}
+						
+						} else {	// If larger than minimums
+							
+							if ((base.ssHeight/base.ssWidth) > base.ratio){
+								base.settings.fit_landscape && base.ratio < 1 ? base._resizeWidth() : base._resizeHeight();	// If landscapes are set to fit
+							} else {
+								base.settings.fit_portrait && base.ratio >= 1 ? base._resizeHeight() : base._resizeWidth();		// If portraits are set to fit
+							}
+							
+						}
+					}
+					/* ---------- End Resize ---------- */
 					
 					// Horizontally Center
 					if (base.settings.horizontal_center) base.focusResize.css('left', (base.ssWidth - base.focusResize.width())/2);
 					
 					// Vertically Center
 					if (base.settings.vertical_center) base.focusResize.css('top', (base.ssHeight - base.focusResize.height())/2);
+					
+					// Basic image drag and right click protection
+					if (base.settings.image_protect){	
+					  $('img', base.el).bind("contextmenu mousedown",function(){
+					  	return false;
+					  });
+					}
 								
 				}
 			});
@@ -146,7 +197,7 @@
 			  		this.focusResize.width(this.settings.min_width);
 			    		this.focusResize.height(this.focusResize.width() * this.ratio);
 			    	}else{
-			    		base.resizeHeight();
+			    		base._resizeHeight();
 			    	}
 			    }
 			}else{
@@ -176,7 +227,7 @@
 			  		this.focusResize.height(this.settings.min_height);
 			  		this.focusResize.width(this.focusResize.height() / this.ratio);
 			  	}else{
-			  		base.resizeWidth(true);
+			  		base._resizeWidth(true);
 			  	}
 			  }
 			}else{	// Otherwise, resized as normal
@@ -194,7 +245,6 @@
 			  }
 			}
 		}
-		
 		
 	};
 	
@@ -231,11 +281,12 @@
 		// Size & Position
 		fit_always				:		0,			// Image will never exceed browser width or height (Ignores min. dimensions)
 		fit_landscape			:   0,			// Landscape images will not exceed browser width
-		fit_portrait      :   1,			// Portrait images will not exceed browser height  			   
+		fit_portrait      :   1,			// Portrait images will not exceed browser height
+		fit_height_only		:		0,			// Images will not exceed browser height		   
 		min_width		      :   0,			// Min width allowed (in pixels)
 		min_height		    :   0,			// Min height allowed (in pixels)
-		horizontal_center :   0,			// Horizontally center background
-		vertical_center   :   0,			// Vertically center background
+		horizontal_center :   1,			// Horizontally center background
+		vertical_center   :   1,			// Vertically center background
 												   
 		// Components							
 		slide_links				:	1,			// Individual links for each slide (Options: false, 'num', 'name', 'blank')
