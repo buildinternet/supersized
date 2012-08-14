@@ -40,7 +40,7 @@
 			isLoaded: false,
 			origHeight: 0,
 			origWidth:	0,
-			ratio:	1
+			ratio:	1,
 		};
 		
 		$.each(base.settings.slides, function(i){
@@ -61,8 +61,9 @@
 				
 		// Load Initial Slides
 		// --------------------------------------------------
+		base.loadSlide(0);
+		base.loadSlide(1);
 		base.loadSlide(2);
-		
 		
 		
 	};
@@ -89,10 +90,10 @@
 				targetSlide.html(slideToLoad.hide()).removeClass('ss-loading');
 				
 				// Add to slide stack
-				base._slideStack[slide].isLoaded = true;
 				base._slideStack[slide].origHeight = slideToLoad.height();
 				base._slideStack[slide].origWidth = slideToLoad.width();
 				base._slideStack[slide].ratio = (slideToLoad.height() / slideToLoad.width()).toFixed(2);
+				base._slideStack[slide].isLoaded = true;
 				
 				base.resizeImages();
 				
@@ -117,9 +118,8 @@
 			$('img', base.$el).each(function(){
 				if (base._slideStack[$(this).index()].isLoaded){ // make sure image loaded
 					base.ratio = base._slideStack[$(this).index()].ratio; // image ratio
-					
-					base.focusResize = $(this); // image to be resized			
-					
+					console.log(base.ratio);
+					base.focusResize = $(this); // image to be resized
 					
 					/* ---------- Determine Resize ---------- */
 					if (base.settings.fit_always){	// Fit always is enabled

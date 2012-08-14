@@ -62,10 +62,7 @@ body {
   position: absolute;
   top: 50%;
   margin-top: -20px;
-  padding: 10px 15px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+  padding: 10px 10px;
   -webkit-transition: all 200ms ease-in-out;
   -moz-transition: all 200ms ease-in-out;
   transition: all 200ms ease-in-out;
@@ -80,10 +77,10 @@ body {
   background: rgba(0, 0, 0, 0.85);
 }
 #ss-next {
-  right: -5px;
+  right: 0;
 }
 #ss-prev {
-  left: -5px;
+  left: 0;
 }
 #ss-progress-bar {
   position: fixed;
