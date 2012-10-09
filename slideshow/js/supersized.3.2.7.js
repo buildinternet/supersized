@@ -539,7 +539,7 @@
 	    		    nextslide.css({opacity : 0, 'visibility': 'visible'}).animate({opacity : 1, avoidTransforms : false}, base.options.transition_speed, function(){ base.afterAnimation(); });
 	    		    break;
 	    		case 2: case 'slideTop':	// Slide Top
-	    		    nextslide.css({top : -base.$el.height(), 'visibility': 'visible'}.animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
+	    		    nextslide.css({top : -base.$el.height(), 'visibility': 'visible'}).animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
 	    		    break;
 	    		case 3: case 'slideRight':	// Slide Right
 	    			nextslide.css({left : base.$el.width(), 'visibility': 'visible'}).animate({ left:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
