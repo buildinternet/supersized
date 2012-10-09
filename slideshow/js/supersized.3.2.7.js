@@ -536,7 +536,7 @@
 	    		    nextslide.css('visibility','visible'); vars.in_animation = false; base.afterAnimation();
 	    		    break;
 	    		case 1: case 'fade':	// Fade
-	    		    nextslide.animate({opacity : 0},0).css('visibility','visible').animate({opacity : 1, avoidTransforms : false}, base.options.transition_speed, function(){ base.afterAnimation(); });
+	    		    nextslide.css({opacity : 0}).css('visibility','visible').animate({opacity : 1, avoidTransforms : false}, base.options.transition_speed, function(){ base.afterAnimation(); });
 	    		    break;
 	    		case 2: case 'slideTop':	// Slide Top
 	    		    nextslide.animate({top : -base.$el.height()}, 0 ).css('visibility','visible').animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
