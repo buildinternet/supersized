@@ -28,14 +28,14 @@
     			if (api.options.progress_bar) theme.progressBar();
 			}else{
 				if ($(vars.play_button).attr('src')) $(vars.play_button).attr("src", vars.image_path + "play.png");	// If pause play button is image, swap src
-				if (api.options.progress_bar) $(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );	//  Place progress bar
+				if (api.options.progress_bar) $(vars.progress_bar).stop().css({left : -$(window).width()});	//  Place progress bar
 			}
 			
 			
 			/* Thumbnail Tray
 			----------------------------*/
 			// Hide tray off screen
-			$(vars.thumb_tray).animate({bottom : -$(vars.thumb_tray).height()}, 0 );
+			$(vars.thumb_tray).css({bottom : -$(vars.thumb_tray).height()});
 			
 			// Thumbnail Tray Toggle
 			$(vars.tray_button).toggle(function(){
@@ -159,7 +159,7 @@
 					if (vars.slideshow_interval) clearInterval(vars.slideshow_interval);
 					if (api.options.slides.length - 1 > 0) clearInterval(vars.slideshow_interval);
 					
-					$(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );
+					$(vars.progress_bar).stop().css({left : -$(window).width()});
 					
 					if (!vars.progressDelay && api.options.slideshow){
 						// Delay slideshow from resuming so Chrome can refocus images
@@ -198,7 +198,7 @@
 		----------------------------*/
 	 	goTo : function(){
 	 		if (api.options.progress_bar && !vars.is_paused){
-				$(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );
+				$(vars.progress_bar).stop().css({left : -$(window).width()});
 				theme.progressBar();
 			}
 		},
@@ -214,7 +214,7 @@
 	 		}else if (state == 'pause'){
 	 			// If image, swap to play
 	 			if ($(vars.play_button).attr('src')) $(vars.play_button).attr("src", vars.image_path + "play.png");
-        		if (api.options.progress_bar && vars.is_paused)$(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );
+        		if (api.options.progress_bar && vars.is_paused)$(vars.progress_bar).stop().css({left : -$(window).width()});
 	 		}
 	 		
 	 	},
@@ -223,7 +223,7 @@
 	 	/* Before Slide Transition
 		----------------------------*/
 	 	beforeAnimation : function(direction){
-		    if (api.options.progress_bar && !vars.is_paused) $(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 );
+		    if (api.options.progress_bar && !vars.is_paused) $(vars.progress_bar).stop().css({left : -$(window).width()});
 		  	
 		  	/* Update Fields
 		  	----------------------------*/
@@ -284,7 +284,7 @@
 	 	/* Progress Bar
 		----------------------------*/
 		progressBar : function(){
-    		$(vars.progress_bar).stop().animate({left : -$(window).width()}, 0 ).animate({ left:0 }, api.options.slide_interval);
+    		$(vars.progress_bar).stop().css({left : -$(window).width()}).animate({ left:0 }, api.options.slide_interval);
     	}
 	 	
 	 
