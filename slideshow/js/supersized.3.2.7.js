@@ -215,6 +215,7 @@
 				$(document.documentElement).keyup(function (event) {
 				
 					if(vars.in_animation) return false;		// Abort if currently animating
+					if($(document.activeElement).is("input, textarea")) return false; // Abort if active element is an input or a textarea.
 					
 					// Left Arrow or Down Arrow
 					if ((event.keyCode == 37) || (event.keyCode == 40)) {
