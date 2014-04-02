@@ -516,7 +516,8 @@
 				
 			}
 			
-			
+			// Clean up memory leak
+			$(prevslide).empty();
 			
 			/*-----End Load Image-----*/
 			
