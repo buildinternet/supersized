@@ -39,7 +39,21 @@
         	$.supersized.vars.options = $.extend({},$.supersized.defaultOptions, $.supersized.themeOptions, options);
             base.options = $.supersized.vars.options;
             
+            if(base.options.slide_container != null) base._getSlides();
             base._build();
+        };
+        
+        base._getSlides = function() {
+         base.options.slides = [];
+         var container = base.options.slide_container;
+         $.each($(container+' img'), function(i, v) {
+           var slide_image = $(v).attr('src');
+           var slide_title = $(v).attr('title');
+           var slide_thumb = $(v).attr('thumb');
+           var slide_url = $(v).attr('url');
+           base.options.slides.push({image : slide_image, title : slide_title, thumb : slide_thumb, url : slide_url});
+         });
+         $(container).remove();         
         };
         
         
