@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.7
+	Version : 3.2.8
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -43,6 +43,9 @@
             base._build();
         };
         
+        /* get Slides from Dom by slide_container (JQuery Selector) 
+        * added by Marcel Grolms <grolms@suabo.de>
+        */
         base._getSlides = function() {
          base.options.slides = [];
          var container = base.options.slide_container;
