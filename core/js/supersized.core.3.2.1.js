@@ -221,7 +221,11 @@
 					}
 					
 					// Horizontally Center
-					if (base.options.horizontal_center){
+					if (base.options.horizontal_align == 'right'){
+						$(this).css('left', (browserwidth - $(this).width()));
+					} else if (base.options.horizontal_align == 'left'){
+						$(this).css('left', 0);
+					} else if (base.options.horizontal_center || base.options.horizontal_align == 'center'){
 						$(this).css('left', (browserwidth - $(this).width())/2);
 					}
 					
@@ -288,6 +292,7 @@
 		min_height		        :   0,			// Min height allowed (in pixels)
 		vertical_center         :   1,			// Vertically center background
 		horizontal_center       :   1,			// Horizontally center background
+		horizontal_align        :   'center',	// Horizontally align background
 		fit_always				:	0,			// Image will never exceed browser width or height (Ignores min. dimensions)
 		fit_portrait         	:   1,			// Portrait images will not exceed browser height
 		fit_landscape			:   0			// Landscape images will not exceed browser width
