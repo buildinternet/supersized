@@ -4,6 +4,10 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+26/05/14 - 3.2.8
+
+	*Added support to load images from DOM with base.options.slide_container (JQuery Selector)
+
 2/23/12 - 3.2.7
 
 	*Fixed issue with previous thumbnail not loading correctly
