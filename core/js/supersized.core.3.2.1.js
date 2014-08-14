@@ -16,6 +16,7 @@
 	----------------------------*/
 	$(document).ready(function() {
 		$('body').append('<div id="supersized-loader"></div><div id="supersized"></div>');
+		$(document).trigger( 'supersized-ready' );
 	});
     
     
