@@ -17,7 +17,7 @@ body { background:#111; height:100%; }
 	#supersized-loader { position:absolute; top:50%; left:50%; z-index:0; width:60px; height:60px; margin:-30px 0 0 -30px; text-indent:-999em; background:url(../img/progress.gif) no-repeat center center;}
 	
 	#supersized {  display:block; position:fixed; left:0; top:0; overflow:hidden; z-index:-999; height:100%; width:100%; }
-		#supersized img { width:auto; height:auto; position:relative; display:none; outline:none; border:none; }
+		#supersized img { max-width: none !important; max-height: none !important; width:auto; height:auto; position:relative; display:none; outline:none; border:none; }
 			#supersized.speed img { -ms-interpolation-mode:nearest-neighbor; image-rendering: -moz-crisp-edges; }	/*Speed*/
 			#supersized.quality img { -ms-interpolation-mode:bicubic; image-rendering: optimizeQuality; }			/*Quality*/
 		
