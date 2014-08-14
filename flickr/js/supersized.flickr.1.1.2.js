@@ -136,16 +136,16 @@
     	switch(options.source){
 		    		
 	    	case 1:		//From a Set
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&format=json&jsoncallback=?';
+	    		var flickrURL =  'https://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=' + options.api_key + '&photoset_id=' + options.set + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&format=json&jsoncallback=?';
 	    		break;
 	    	case 2:		//From a User
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
+	    		var flickrURL =  'https://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&user_id=' + options.user + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
 	    	case 3:		//From a Group
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
+	    		var flickrURL =  'https://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&group_id=' + options.group + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
 		case 4:		//From tags
-	    		var flickrURL =  'http://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&tags=' + options.tags + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
+	    		var flickrURL =  'https://api.flickr.com/services/rest/?format=json&method=flickr.photos.search&api_key=' + options.api_key + '&tags=' + options.tags + '&per_page=' + options.total_slides + '&sort=' + sort_order + '&jsoncallback=?';
 	    		break;
 	    }
 
