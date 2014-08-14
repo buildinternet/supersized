@@ -183,24 +183,34 @@
 					for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);	//Fisher-Yates shuffle algorithm (jsfromhell.com/array/shuffle)
 				    options.slides = arr;
 				}
+                
+                //*** if flickr returns a number of slides less than the total requested
+                if (currentSlide > options.slides.length - 1){
+                    options.random ? currentSlide = Math.floor(Math.random()*options.slides.length) : currentSlide = options.slides.length - 1;
+                }
     			
     			/***Load initial set of images***/
     			
 				if (options.slides.length > 1){
 					//Set previous image
 					currentSlide - 1 < 0  ? loadPrev = options.slides.length - 1 : loadPrev = currentSlide - 1;	//If slide is 1, load last slide as previous
-					var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "";
+                    console.log("loadPrev: " + loadPrev + " currentSlide: " + currentSlide);
+                    console.log(options.slides);
+                    for(var i = 0; i < options.slides.length; i++) {
+                        console.log(options.slides[i]);
+                    }
+					var imageLink = (options.slides[loadPrev].url) ? "href='" + options.slides[loadPrev].url + "'" : "javascript:void(0)";
 					$("<img/>").attr("src", options.slides[loadPrev].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
 				}
 				
 				//Set current image
-				imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "";
+				imageLink = (options.slides[currentSlide].url) ? "href='" + options.slides[currentSlide].url + "'" : "javascript:void(0)";
 				$("<img/>").attr("src", options.slides[currentSlide].image).appendTo(element).wrap('<a class="activeslide" ' + imageLink + linkTarget + '></a>');
 			
 				if (options.slides.length > 1){
 					//Set next image
 					currentSlide == options.slides.length - 1 ? loadNext = 0 : loadNext = currentSlide + 1;	//If slide is last, load first slide as next
-					imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "";
+					imageLink = (options.slides[loadNext].url) ? "href='" + options.slides[loadNext].url + "'" : "javascript:void(0)";
 					$("<img/>").attr("src", options.slides[loadNext].image).appendTo(element).wrap('<a ' + imageLink + linkTarget + '></a>');
 				}
 				
