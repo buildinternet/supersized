@@ -559,6 +559,14 @@
 	    			nextslide.css({left : -base.$el.width(), 'visibility': 'visible'}).animate({ left:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
 					liveslide.animate({ left: base.$el.width(), avoidTransforms : false }, base.options.transition_speed );
 	    			break;
+	    		case 8: case 'carouselTop':   // Carousel Top
+	    			nextslide.animate({top : -base.$el.height()}, 0 ).css('visibility','visible').animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
+					liveslide.animate({ top: base.$el.height(), avoidTransforms : false }, base.options.transition_speed );
+	    			break;
+	    		case 9: case 'carouselBottom':   // Carousel Bottom
+	    			nextslide.animate({top : base.$el.height()}, 0 ).css('visibility','visible').animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
+					liveslide.animate({ top: -base.$el.height(), avoidTransforms : false }, base.options.transition_speed );
+	    			break;
 	    	}
 		    return false;	
 		};
@@ -660,6 +668,14 @@
 	    		case 7: case 'carouselLeft':   // Carousel Left (reverse)
 	    			nextslide.css({left : base.$el.width(), 'visibility': 'visible'}).animate({ left:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
 					liveslide.css({left : 0}).animate({ left: -base.$el.width(), avoidTransforms : false }, base.options.transition_speed );
+	    			break;
+	    		case 8: case 'carouselTop':   // Carousel Top (reverse)
+	    			nextslide.animate({top : base.$el.height()}, 0 ).css('visibility','visible').animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
+					liveslide.animate({ top: -base.$el.height(), avoidTransforms : false }, base.options.transition_speed );
+	    			break;
+	    		case 9: case 'carouselBottom':   // Carousel Bottom (reverse)
+	    			nextslide.animate({top : -base.$el.height()}, 0 ).css('visibility','visible').animate({ top:0, avoidTransforms : false }, base.options.transition_speed, function(){ base.afterAnimation(); });
+					liveslide.animate({ top: base.$el.height(), avoidTransforms : false }, base.options.transition_speed );
 	    			break;
 	    	}
 		    return false;	
