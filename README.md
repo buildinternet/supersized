@@ -4,6 +4,9 @@ Documentation can be found on the official project page: [http://www.buildintern
 
 *** Changelog ***
 
+8/22/14 - 3.2.8
+	*Resize the background image on the orientationchange event
+
 2/23/12 - 3.2.7
 
 	*Fixed issue with previous thumbnail not loading correctly
