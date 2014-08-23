@@ -1,6 +1,6 @@
 /*
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Flickr Edition Version 1.1.2
+	Flickr Edition Version 1.1.3
 	www.buildinternet.com/project/supersized
 	
 	By Sam Dunn / One Mighty Roar (www.onemightyroar.com)
@@ -505,6 +505,10 @@
 		   	});
 		}
 		
+		// Adjust image when device orientation changes
+		$(window).bind('orientationchange', function() {
+			resizenow();
+		});
 				
 		//Adjust image when browser is resized
 		$(window).resize(function(){

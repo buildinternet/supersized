@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : Core 3.2.1
+	Version : Core 3.2.2
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
