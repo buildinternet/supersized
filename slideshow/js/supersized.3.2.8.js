@@ -1,7 +1,7 @@
 /*
 
 	Supersized - Fullscreen Slideshow jQuery Plugin
-	Version : 3.2.7
+	Version : 3.2.8
 	Site	: www.buildinternet.com/project/supersized
 	
 	Author	: Sam Dunn
@@ -296,6 +296,11 @@
 								
 			}
 			
+			// Adjust image when device orientation changes
+			$(window).bind('orientationchange', function() {
+				base.resizeNow();
+			});
+
 			// Adjust image when browser is resized
 			$(window).resize(function(){
 	    		base.resizeNow();
