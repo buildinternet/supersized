@@ -88,6 +88,11 @@
 			base.$el.css('visibility','visible');
 			$('#supersized-loader').hide();		//Hide loading animation
 			
+			// Adjust image when device orientation changes
+			$(window).bind('orientationchange', function() {
+				base.resizeNow();
+			});
+
 			// Adjust image when browser is resized
 			$(window).resize(function(){
 	    		base.resizeNow();
