@@ -12,14 +12,13 @@
 
 (function($){
 
-	/* Place Supersized Elements
-	----------------------------*/
-	$(document).ready(function() {
-		$('body').append('<div id="supersized-loader"></div><ul id="supersized"></ul>');
-	});
-    
-    
     $.supersized = function(options){
+
+      /* Place Supersized Elements
+      ----------------------------*/
+      if ($('#supersized').size() == 0) {
+        $('body').append('<div id="supersized-loader"></div><ul id="supersized"></ul>');
+      }
     	
     	/* Variables
 		----------------------------*/
