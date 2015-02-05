@@ -148,7 +148,8 @@
 					vars.current_slide - 1 < 0  ? loadPrev = base.options.slides.length - 1 : loadPrev = vars.current_slide - 1;	// If slide is 1, load last slide as previous
 					var imageLink = (base.options.slides[loadPrev].url) ? "href='" + base.options.slides[loadPrev].url + "'" : "";
 				
-					var imgPrev = $('<img src="'+base.options.slides[loadPrev].image+'"/>');
+					var imgAlt = (base.options.slides[loadPrev].alt) ? "alt='" + base.options.slides[loadPrev].alt + "'" : "";
+					var imgPrev = $('<img ' + imgAlt + 'src="'+base.options.slides[loadPrev].image+'"/>');
 					var slidePrev = base.el+' li:eq('+loadPrev+')';
 					imgPrev.appendTo(slidePrev).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading prevslide');
 				
@@ -164,7 +165,8 @@
 			
 			// Set current image
 			imageLink = (api.getField('url')) ? "href='" + api.getField('url') + "'" : "";
-			var img = $('<img src="'+api.getField('image')+'"/>');
+			var imageAlt = (api.getField('alt')) ? "alt='" + api.getField('alt') + "' " : "";
+			var img = $('<img ' + imageAlt + 'src="'+api.getField('image')+'"/>');
 			
 			var slideCurrent= base.el+' li:eq('+vars.current_slide+')';
 			img.appendTo(slideCurrent).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading activeslide');
@@ -181,7 +183,9 @@
 				vars.current_slide == base.options.slides.length - 1 ? loadNext = 0 : loadNext = vars.current_slide + 1;	// If slide is last, load first slide as next
 				imageLink = (base.options.slides[loadNext].url) ? "href='" + base.options.slides[loadNext].url + "'" : "";
 				
-				var imgNext = $('<img src="'+base.options.slides[loadNext].image+'"/>');
+				var imageAlt = (base.options.slides[loadNext].alt) ? "alt='" + (base.options.slides[loadNext].alt) + "' " : "";
+
+				var imgNext = $('<img ' + imageAlt + 'src="'+base.options.slides[loadNext].image+'"/>');
 				var slideNext = base.el+' li:eq('+loadNext+')';
 				imgNext.appendTo(slideNext).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading');
 				
@@ -492,7 +496,8 @@
 				var linkTarget = base.options.new_window ? ' target="_blank"' : '';
 				
 				imageLink = (base.options.slides[loadSlide].url) ? "href='" + base.options.slides[loadSlide].url + "'" : "";	// If link exists, build it
-				var img = $('<img src="'+base.options.slides[loadSlide].image+'"/>'); 
+				var imageAlt = (base.options.slides[loadSlide].alt) ? "alt='" + (base.options.slides[loadSlide].alt) + "' " : "";
+				var img = $('<img ' + imageAlt + 'src="'+base.options.slides[loadSlide].image+'"/>'); 
 				
 				img.appendTo(targetList).wrap('<a ' + imageLink + linkTarget + '></a>').parent().parent().addClass('image-loading').css('visibility','hidden');
 				
